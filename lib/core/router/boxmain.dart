@@ -16,7 +16,7 @@ class ScaffoldWithAppbar extends ConsumerWidget {
         currentIndex: navigationShell.currentIndex,
         onTap: _onTap,
         items: [
-          BottomNavigationBarItem(icon: const Icon(Icons.home_outlined), activeIcon: const Icon(Icons.home_rounded), label: 'Home'),
+          BottomNavigationBarItem(icon: const Icon(Icons.document_scanner_outlined), activeIcon: const Icon(Icons.document_scanner_rounded), label: 'Documents'),
           BottomNavigationBarItem(icon: const Icon(Icons.timer_sharp), activeIcon: const Icon(Icons.timer_sharp), label: 'Reminders'),
         ],
       ),

@@ -1,21 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:law_app/components/export.dart';
-import '../providers/controllers/category_controller.dart';
-import 'widgets/home_screen_mobile_widgets.dart';
+import 'package:law_app/components/base_full_widget.dart';
+import 'package:responsive_builder/responsive_builder.dart';
 
-class HomeScreen extends BaseStatefulWidget {
-  const HomeScreen({super.key});
+class SummaryWidget extends BaseStatefulWidget {
+  const SummaryWidget({super.key});
   @override
-  BaseState<HomeScreen> createState() => _HomeScreenState();
+  BaseState<SummaryWidget> createState() => _SummaryWidgetState();
 }
 
-class _HomeScreenState extends BaseState<HomeScreen> {
-  @override
-  void initState() {
-    ref.read(dataAppProvider.notifier).get();
-    super.initState();
-  }
-
+class _SummaryWidgetState extends BaseState<SummaryWidget> {
   @override
   Widget buildDesktop(BuildContext context, SizingInformation sizingInformation) {
     return Center(child: Text('Desktop View', style: Theme.of(context).textTheme.titleLarge));
@@ -28,6 +21,6 @@ class _HomeScreenState extends BaseState<HomeScreen> {
 
   @override
   Widget buildMobile(BuildContext context, SizingInformation sizingInformation) {
-    return HomeScreenMobileWidgets();
+    return Center(child: Text('Mobile View', style: Theme.of(context).textTheme.titleLarge));
   }
 }
