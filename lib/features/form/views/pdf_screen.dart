@@ -23,6 +23,13 @@ class _PDFScreenState extends ConsumerState<PDFScreen> {
       appBar: AppBar(
         title: const Text('PDF Viewer'),
         actions: [
+          // ตั้งค่าแจ้งเตือน
+          IconButton(
+            icon: const Icon(Icons.timer_outlined),
+            onPressed: () {
+              // Handle notification settings action
+            },
+          ),
           // download button
           IconButton(
             icon: const Icon(Icons.download),
@@ -34,6 +41,7 @@ class _PDFScreenState extends ConsumerState<PDFScreen> {
       ),
       // show pdf form assets/pdf_form.pdf
       body: PDFView(
+        backgroundColor: Colors.white,
         filePath: path),
     );
   }

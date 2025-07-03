@@ -24,12 +24,12 @@ class TabDocumentCategory extends ConsumerWidget {
             separatorBuilder: (context, index) => SizedBox(width: 8.w),
             itemBuilder: (context, index) {
               final category = statedata.value![index];
-              final isSelected = ref.watch(selectedCategoryProvider) == category.hdId;
+              final isSelected = ref.watch(selectedCategoryProvider) == category.id;
               return GestureDetector(
                 onTap: () {
                   //Unfocus the keyboard when a category is selected
                   FocusScope.of(context).unfocus();
-                  ref.read(selectedCategoryProvider.notifier).state = isSelected ? '0' : category.hdId!;
+                  ref.read(selectedCategoryProvider.notifier).state = isSelected ? '0' : category.id.toString();
                   _searchController.clear();
                   ref.read(searchQueryProvider.notifier).state = '';
                 },
@@ -42,7 +42,7 @@ class TabDocumentCategory extends ConsumerWidget {
                     border: Border.all(color: isSelected ? Theme.of(context).colorScheme.primary : Colors.transparent),
                   ),
                   child: Text(
-                    category.hdName ?? 'ไม่มีหมวดหมู่',
+                    category.categoryFormName,
                     style: TextStyle(
                       color: isSelected ? Colors.white : Theme.of(context).colorScheme.onSurface,
                       fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,

@@ -84,6 +84,9 @@ dependencies:
   google_fonts: ^6.2.1
   responsive_framework: ^1.5.1
   responsive_builder: ^0.7.1
+  flutter_native_splash: ^2.4.6
+  shared_preferences: ^2.5.3
+  collection: ^1.19.1
 
 dev_dependencies:
   flutter_test:
@@ -147,3 +150,5 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+#flutter pub run build_runner build

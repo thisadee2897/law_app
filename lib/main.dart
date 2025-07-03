@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:law_app/core/database/objectbox_database.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
-
+late ObjectBoxDatabase objectBox;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+    FlutterNativeSplash.remove();
+  objectBox = await ObjectBoxDatabase.init();
   runApp(const ProviderScope(child: MyApp()));
 }
 

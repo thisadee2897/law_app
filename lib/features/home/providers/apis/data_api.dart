@@ -21,7 +21,14 @@ final jsonData = [
     "hd_image": "assets/images/fervour-lighting-sound-2559.png",
     "hd_updated_at": "2023-10-01T12:00:00Z",
     "form": [
-      {"hd_id": "1", "form_id": "1", "form_name": "Criminal Law", "form_pdf": "assets/pdfs/test.pdf", "favorite": false, "updated_at": "2023-10-01T12:00:00Z"},
+      {
+          "hd_id": "1",
+          "form_id": "1", 
+          "form_name": "Criminal Law", 
+          "form_pdf": "assets/pdfs/test.pdf", 
+          "favorite": false, 
+          "updated_at": "2023-10-01T12:00:00Z",
+          },
       {"hd_id": "1", "form_id": "2", "form_name": "Civil Law", "form_pdf": "assets/pdfs/test.pdf", "favorite": true, "updated_at": "2023-10-01T12:00:00Z"},
       {"hd_id": "1", "form_id": "3", "form_name": "Family Law", "form_pdf": "assets/pdfs/test.pdf", "favorite": false, "updated_at": "2023-10-01T12:00:00Z"},
       {"hd_id": "1", "form_id": "4", "form_name": "Property Law", "form_pdf": "assets/pdfs/test.pdf", "favorite": false, "updated_at": "2023-10-01T12:00:00Z"},

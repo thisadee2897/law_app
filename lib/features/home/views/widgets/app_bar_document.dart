@@ -10,7 +10,7 @@ class AppBarDocument extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return SliverAppBar(
-      expandedHeight: 158,
+      expandedHeight: 160, // Increased from 158
       floating: false,
       pinned: true,
       elevation: 0,

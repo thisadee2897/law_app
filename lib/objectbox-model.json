@@ -1,0 +1,119 @@
+{
+  "_note1": "KEEP THIS FILE! Check it into a version control system (VCS) like git.",
+  "_note2": "ObjectBox manages crucial IDs for your object model. See docs for details.",
+  "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
+  "entities": [
+    {
+      "id": "1:5588003524868428635",
+      "lastPropertyId": "7:2395836971727926811",
+      "name": "CategoryFormModel",
+      "properties": [
+        {
+          "id": "1:3401349033596523051",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:942281868437445780",
+          "name": "categoryFormName",
+          "type": 9
+        },
+        {
+          "id": "3:6672390356910706941",
+          "name": "categoryFormFullName",
+          "type": 9
+        },
+        {
+          "id": "4:2902330201501160363",
+          "name": "categoryFormImage",
+          "type": 9
+        },
+        {
+          "id": "5:6147847905111582867",
+          "name": "categoryFormUpdatedAt",
+          "type": 10
+        },
+        {
+          "id": "6:3011935335988580535",
+          "name": "categoryFormActive",
+          "type": 1
+        },
+        {
+          "id": "7:2395836971727926811",
+          "name": "categoryId",
+          "type": 6
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "2:840176663917475305",
+      "lastPropertyId": "9:6267931215202466945",
+      "name": "FormModel",
+      "properties": [
+        {
+          "id": "1:256862831634139434",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:6875703083948877537",
+          "name": "formName",
+          "type": 9
+        },
+        {
+          "id": "3:2295156702775157012",
+          "name": "formImage",
+          "type": 9
+        },
+        {
+          "id": "4:46748583338434363",
+          "name": "formUpdatedAt",
+          "type": 10
+        },
+        {
+          "id": "5:8751431503724326421",
+          "name": "formActive",
+          "type": 1
+        },
+        {
+          "id": "6:4005107395605907619",
+          "name": "pdfPath",
+          "type": 9
+        },
+        {
+          "id": "7:1338494067676315839",
+          "name": "favorite",
+          "type": 1
+        },
+        {
+          "id": "8:5212007686940785585",
+          "name": "categoryFormId",
+          "type": 11,
+          "flags": 520,
+          "indexId": "1:1704605792094889468",
+          "relationTarget": "CategoryFormModel"
+        },
+        {
+          "id": "9:6267931215202466945",
+          "name": "formId",
+          "type": 6
+        }
+      ],
+      "relations": []
+    }
+  ],
+  "lastEntityId": "2:840176663917475305",
+  "lastIndexId": "1:1704605792094889468",
+  "lastRelationId": "0:0",
+  "lastSequenceId": "0:0",
+  "modelVersion": 5,
+  "modelVersionParserMinimum": 5,
+  "retiredEntityUids": [],
+  "retiredIndexUids": [],
+  "retiredPropertyUids": [],
+  "retiredRelationUids": [],
+  "version": 1
+}

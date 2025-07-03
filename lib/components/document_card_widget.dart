@@ -4,9 +4,11 @@ import 'package:law_app/components/export.dart';
 import 'package:law_app/features/home/providers/controllers/category_controller.dart';
 import 'package:law_app/models/form_p_d_f_model.dart';
 
+// ignore: must_be_immutable
 class DocumentCardWidget extends ConsumerWidget {
   final FormPDFModel document;
-  const DocumentCardWidget(this.document, {super.key});
+  void Function(FormPDFModel) onPressed;
+  DocumentCardWidget(this.document, {super.key, required this.onPressed});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -69,7 +71,7 @@ class DocumentCardWidget extends ConsumerWidget {
                         Text(
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          ref.watch(categoriesProvider).firstWhere((category) => category.hdId == document.hdId).hdName ?? 'ไม่มีหมวดหมู่',
+                          ref.watch(categoriesProvider).firstWhere((category) => category.id.toString() == document.hdId).categoryFormName,
                           style: TextStyle(fontSize: 12.sp, color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.w600),
                         ),
                       ],
@@ -105,7 +107,7 @@ class DocumentCardWidget extends ConsumerWidget {
                     spacing: 8.w,
                     children: [
                       // open document
-                      ElevatedButton(onPressed: () {}, child: Text('เปิด', style: TextStyle(fontSize: 12.sp))),
+                      ElevatedButton(onPressed: () => onPressed(document), child: Text('เปิด', style: TextStyle(fontSize: 12.sp))),
                     ],
                   ),
                 ],
