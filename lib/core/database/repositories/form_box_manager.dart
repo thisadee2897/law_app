@@ -1,5 +1,6 @@
 import 'package:law_app/core/database/models/form_model.dart';
-import 'package:objectbox/objectbox.dart';
+import 'package:law_app/core/database/objectbox_database.dart';
+import 'package:law_app/objectbox.g.dart';
 
 class FormBoxManager {
   final Box<FormModel> _formBox;
@@ -7,6 +8,27 @@ class FormBoxManager {
   Box<FormModel> get formBox => _formBox;
   List<FormModel> getAll() => _formBox.getAll();
   Stream<List<FormModel>> streamAll() => _formBox.query().watch(triggerImmediately: true).map((e) => e.find());
+  Stream<List<FormModel>> streamBySelectCate(int categoryId, String searchText) {
+    if (categoryId == 1) {
+      return _formBox.query(FormModel_.formName.contains(searchText, caseSensitive: false)).watch(triggerImmediately: true).map((e) => e.find());
+    } else {
+      return _formBox
+          .query(FormModel_.categoryId.equals(categoryId).and(FormModel_.formName.contains(searchText, caseSensitive: false)))
+          .watch(triggerImmediately: true)
+          .map((e) => e.find());
+    }
+  }
+
+  //toggleFavorite
+  Future<void> toggleFavorite(FormModel form) async {
+    final database = ObjectBoxDatabase.instance;
+    final existingForm = database.formBoxManager.formBox.query(FormModel_.formId.equals(form.formId)).build().findFirst();
+    if (existingForm != null) {
+      existingForm.favorite = !existingForm.favorite;
+      database.formBoxManager.formBox.put(existingForm);
+    }
+  }
+
   FormModel? get(int id) => _formBox.get(id);
   void add(FormModel form) => _formBox.put(form);
   void update(FormModel form) => _formBox.put(form);

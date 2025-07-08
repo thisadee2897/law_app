@@ -81,7 +81,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(2, 840176663917475305),
     name: 'FormModel',
-    lastPropertyId: const obx_int.IdUid(9, 6267931215202466945),
+    lastPropertyId: const obx_int.IdUid(11, 7630692736525170121),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -138,6 +138,18 @@ final _entities = <obx_int.ModelEntity>[
         id: const obx_int.IdUid(9, 6267931215202466945),
         name: 'formId',
         type: 6,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(10, 1847353900952257490),
+        name: 'categoryId',
+        type: 6,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(11, 7630692736525170121),
+        name: 'code',
+        type: 9,
         flags: 0,
       ),
     ],
@@ -301,7 +313,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
             ? null
             : fbb.writeString(object.formImage!);
         final pdfPathOffset = fbb.writeString(object.pdfPath);
-        fbb.startTable(10);
+        final codeOffset = fbb.writeString(object.code);
+        fbb.startTable(12);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, formNameOffset);
         fbb.addOffset(2, formImageOffset);
@@ -311,6 +324,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addBool(6, object.favorite);
         fbb.addInt64(7, object.categoryForm.targetId);
         fbb.addInt64(8, object.formId);
+        fbb.addInt64(9, object.categoryId);
+        fbb.addOffset(10, codeOffset);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -332,6 +347,15 @@ obx_int.ModelDefinition getObjectBoxModel() {
           buffer,
           rootOffset,
           20,
+          0,
+        );
+        final codeParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 24, '');
+        final categoryIdParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          22,
           0,
         );
         final formNameParam = const fb.StringReader(
@@ -361,6 +385,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final object = FormModel(
           id: idParam,
           formId: formIdParam,
+          code: codeParam,
+          categoryId: categoryIdParam,
           formName: formNameParam,
           formImage: formImageParam,
           formUpdatedAt: formUpdatedAtParam,
@@ -471,5 +497,15 @@ class FormModel_ {
   /// See [FormModel.formId].
   static final formId = obx.QueryIntegerProperty<FormModel>(
     _entities[1].properties[8],
+  );
+
+  /// See [FormModel.categoryId].
+  static final categoryId = obx.QueryIntegerProperty<FormModel>(
+    _entities[1].properties[9],
+  );
+
+  /// See [FormModel.code].
+  static final code = obx.QueryStringProperty<FormModel>(
+    _entities[1].properties[10],
   );
 }

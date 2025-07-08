@@ -4,8 +4,7 @@ import 'package:law_app/components/export.dart';
 import 'package:law_app/features/home/providers/controllers/category_controller.dart';
 
 class TabDocumentCategory extends ConsumerWidget {
-  const TabDocumentCategory({super.key ,required TextEditingController searchController})
-    : _searchController = searchController;
+  const TabDocumentCategory({super.key, required TextEditingController searchController}) : _searchController = searchController;
 
   final TextEditingController _searchController;
 
@@ -24,12 +23,14 @@ class TabDocumentCategory extends ConsumerWidget {
             separatorBuilder: (context, index) => SizedBox(width: 8.w),
             itemBuilder: (context, index) {
               final category = statedata.value![index];
-              final isSelected = ref.watch(selectedCategoryProvider) == category.id;
+              final isSelected = ref.watch(selectedCategoryProvider) == category.categoryId;
               return GestureDetector(
                 onTap: () {
-                  //Unfocus the keyboard when a category is selected
+                  if(ref.read(selectedCategoryProvider) == category.categoryId) {
+                    return; // Do nothing if the same category is tapped
+                  }
                   FocusScope.of(context).unfocus();
-                  ref.read(selectedCategoryProvider.notifier).state = isSelected ? '0' : category.id.toString();
+                  ref.read(selectedCategoryProvider.notifier).state = isSelected ? 0 : category.categoryId;
                   _searchController.clear();
                   ref.read(searchQueryProvider.notifier).state = '';
                 },

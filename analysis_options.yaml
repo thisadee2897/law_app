@@ -11,6 +11,8 @@ analyzer:
   errors:
     invalid_annotation_target: ignore
     deprecated_member_use: ignore
+    avoid_print: ignore
+    depend_on_referenced_packages: ignore
 include: package:flutter_lints/flutter.yaml
 
 linter:

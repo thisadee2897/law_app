@@ -33,30 +33,43 @@ class ObjectBoxDatabase {
     return _instance;
   }
 
+
   _updateData() {
-    final currentCategoryData = CurrentCategoryData.getData();
+    final currentCategoryData = CurrentCategoryData.getData().where((e) => e.categoryFormActive).toList();
     final formData = CurrentFormPDFData.getData();
     // Update only if there are existing records
     for (var category in currentCategoryData) {
       final existingCategory = categoryFormBoxManager.categoryFormBox.query(CategoryFormModel_.categoryId.equals(category.categoryId)).build().findFirst();
-
       if (existingCategory == null) {
         category.id = 0;
-        categoryFormBoxManager.categoryFormBox.put(category);
+        categoryFormBoxManager.add(category);
       } else {
         category.id = existingCategory.id;
-        categoryFormBoxManager.categoryFormBox.put(category);
+        categoryFormBoxManager.update(category);
       }
+      var forms = formData.where((form) => form.categoryId == category.categoryId).toList();
+      print("forms for category ${category.categoryFormName}: ${forms.length}");
     }
     for (var form in formData) {
       final existingForm = formBoxManager.formBox.query(FormModel_.formId.equals(form.formId)).build().findFirst();
-
       if (existingForm == null) {
         form.id = 0;
         formBoxManager.formBox.put(form);
       } else {
         form.id = existingForm.id;
         formBoxManager.formBox.put(form);
+      }
+    }
+    // update forms for each category
+    for (var category in currentCategoryData) {
+      final forms = formData.where((form) => form.categoryId == category.categoryId).toList();
+      if (forms.isNotEmpty) {
+        final categoryModel = categoryFormBoxManager.categoryFormBox.get(category.id);
+        if (categoryModel != null) {
+          categoryModel.form.clear();
+          categoryModel.form.addAll(forms);
+          categoryFormBoxManager.categoryFormBox.put(categoryModel);
+        }
       }
     }
   }

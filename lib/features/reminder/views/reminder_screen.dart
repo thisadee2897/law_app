@@ -1,9 +1,18 @@
+import 'dart:io';
+
+import 'package:alarm/alarm.dart';
+import 'package:alarm/model/alarm_settings.dart';
+import 'package:alarm/model/notification_settings.dart';
+import 'package:alarm/model/volume_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:law_app/components/export.dart';
 import 'package:law_app/core/router/app_router.dart';
 import 'package:law_app/core/router/route_config.dart';
 import 'package:law_app/core/utils/extension/context_extensions.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
 enum ReminderType { court, deadline, meeting, review, payment, renewal }
 
@@ -138,7 +147,23 @@ class _ReminderScreenState extends ConsumerState<ReminderScreen> with TickerProv
 
   List<Reminder> get _activeReminders => _filteredReminders.where((r) => !r.isCompleted).toList();
   List<Reminder> get _completedReminders => _filteredReminders.where((r) => r.isCompleted).toList();
-
+  final alarmSettings = AlarmSettings(
+    id: 42,
+    dateTime: DateTime.now().add(const Duration(seconds: 10)),
+    assetAudioPath: 'assets/alarm.mp3',
+    loopAudio: true,
+    vibrate: true,
+    warningNotificationOnKill: Platform.isIOS,
+    androidFullScreenIntent: true,
+    volumeSettings: VolumeSettings.fade(volume: 0.8, fadeDuration: Duration(seconds: 5), volumeEnforced: true),
+    notificationSettings: const NotificationSettings(
+      title: 'This is the title',
+      body: 'This is the body',
+      stopButton: 'Stop the alarm',
+      icon: 'notification_icon',
+      iconColor: Color(0xff862778),
+    ),
+  );
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -193,10 +218,15 @@ class _ReminderScreenState extends ConsumerState<ReminderScreen> with TickerProv
                                     ],
                                   ),
                                 ),
-                                Container(
-                                  padding: EdgeInsets.all(isTablet ? 16.w : 12.w),
-                                  decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(16.r)),
-                                  child: Icon(Icons.notifications_active, size: isTablet ? 40.w : 32.w, color: Colors.white),
+                                InkWell(
+                                  onTap: () async {
+                                    await Alarm.set(alarmSettings: alarmSettings);
+                                  },
+                                  child: Container(
+                                    padding: EdgeInsets.all(isTablet ? 16.w : 12.w),
+                                    decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(16.r)),
+                                    child: Icon(Icons.notifications_active, size: isTablet ? 40.w : 32.w, color: Colors.white),
+                                  ),
                                 ),
                               ],
                             ),
@@ -220,7 +250,6 @@ class _ReminderScreenState extends ConsumerState<ReminderScreen> with TickerProv
               margin: EdgeInsets.all(8),
               decoration: BoxDecoration(color: Theme.of(context).colorScheme.surfaceContainerHighest, borderRadius: BorderRadius.circular(25.r)),
               child: TabBar(
-              
                 splashBorderRadius: BorderRadius.all(Radius.circular(50)),
                 dividerColor: Colors.transparent,
                 controller: _tabController,
@@ -262,13 +291,13 @@ class _ReminderScreenState extends ConsumerState<ReminderScreen> with TickerProv
           ),
         ],
       ),
-      //floatingActionButton add 
+      //floatingActionButton add
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           ref.goSubPath(Routes.createOrUpdateReminder);
         },
         icon: const Icon(Icons.add),
-        label: const Text('เพิ่มการแจ้งเตือน',style:TextStyle(color: Colors.white),),
+        label: const Text('เพิ่มการแจ้งเตือน', style: TextStyle(color: Colors.white)),
         backgroundColor: Theme.of(context).colorScheme.primary,
       ),
     );
@@ -604,17 +633,4 @@ class _ReminderScreenState extends ConsumerState<ReminderScreen> with TickerProv
       ),
     );
   }
-
-  // void _showAddReminderDialog(BuildContext context) {
-  //   showDialog(
-  //     context: context,
-  //     builder:
-  //         (context) => AlertDialog(
-  //           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
-  //           title: Row(children: [Icon(Icons.add_alert, color: Theme.of(context).colorScheme.primary), SizedBox(width: 8.w), const Text('เพิ่มการแจ้งเตือน')]),
-  //           content: const Text('ฟีเจอร์นี้จะพัฒนาในขั้นตอนถัดไป'),
-  //           actions: [TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('ตกลง'))],
-  //         ),
-  //   );
-  // }
 }

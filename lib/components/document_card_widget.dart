@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:law_app/components/export.dart';
-import 'package:law_app/features/home/providers/controllers/category_controller.dart';
-import 'package:law_app/models/form_p_d_f_model.dart';
-
+import 'package:law_app/core/database/models/form_model.dart';
+import 'package:law_app/core/database/objectbox_database.dart';
 // ignore: must_be_immutable
 class DocumentCardWidget extends ConsumerWidget {
-  final FormPDFModel document;
-  void Function(FormPDFModel) onPressed;
+  final FormModel document;
+  void Function(FormModel) onPressed;
   DocumentCardWidget(this.document, {super.key, required this.onPressed});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final database = ObjectBoxDatabase.instance;
     return Container(
       margin: EdgeInsets.only(bottom: 16.h),
       child: InkWell(
@@ -59,7 +59,7 @@ class DocumentCardWidget extends ConsumerWidget {
                           children: [
                             Expanded(
                               child: Text(
-                                document.formName ?? 'ไม่มีชื่อเอกสาร',
+                                document.formName,
                                 style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -71,7 +71,7 @@ class DocumentCardWidget extends ConsumerWidget {
                         Text(
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          ref.watch(categoriesProvider).firstWhere((category) => category.id.toString() == document.hdId).categoryFormName,
+                          database.categoryFormBoxManager.getAll().firstWhere((category) => category.categoryId == document.categoryId).categoryFormName,
                           style: TextStyle(fontSize: 12.sp, color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.w600),
                         ),
                       ],
@@ -80,7 +80,8 @@ class DocumentCardWidget extends ConsumerWidget {
                   // Favorite Button
                   IconButton(
                     onPressed: () {
-                      // Toggle favorite logic here
+                      final database = ObjectBoxDatabase.instance;
+                      database.formBoxManager.toggleFavorite(document);
                     },
                     icon: Icon(
                       document.favorite == true ? Icons.favorite : Icons.favorite_border,
@@ -92,15 +93,15 @@ class DocumentCardWidget extends ConsumerWidget {
               ),
               // Description
               Text(
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-                style: TextStyle(fontSize: 14.sp, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7), height: 1.4),
-                maxLines: 2,
+                document.formName,
+                style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7), height: 1.4),
+                maxLines: 3,
                 overflow: TextOverflow.ellipsis,
               ),
               // Footer Row
               Row(
                 children: [
-                  _buildInfoChip(Icons.access_time, _formatDate(DateTime.parse(document.updatedAt!).toLocal()), Colors.green),
+                  _buildInfoChip(Icons.access_time, _formatDate(document.formUpdatedAt!.toLocal()), Colors.green),
                   const Spacer(),
                   // Action Buttons
                   Row(
