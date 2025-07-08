@@ -88,7 +88,8 @@ dependencies:
   shared_preferences: ^2.5.3
   collection: ^1.19.1
   open_file: ^3.5.10
-  alarm: ^5.1.4
+
+
 
 dev_dependencies:
   flutter_test:
@@ -126,6 +127,7 @@ flutter:
     - assets/images/
     - assets/icons/
     - assets/pdfs/
+    - assets/audio/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

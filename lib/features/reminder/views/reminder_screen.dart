@@ -1,9 +1,4 @@
-import 'dart:io';
 
-import 'package:alarm/alarm.dart';
-import 'package:alarm/model/alarm_settings.dart';
-import 'package:alarm/model/notification_settings.dart';
-import 'package:alarm/model/volume_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:law_app/components/export.dart';
@@ -11,8 +6,7 @@ import 'package:law_app/core/router/app_router.dart';
 import 'package:law_app/core/router/route_config.dart';
 import 'package:law_app/core/utils/extension/context_extensions.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+import 'package:law_app/main.dart' as main;
 
 enum ReminderType { court, deadline, meeting, review, payment, renewal }
 
@@ -119,6 +113,7 @@ class _ReminderScreenState extends ConsumerState<ReminderScreen> with TickerProv
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    WidgetsBinding.instance.addPostFrameCallback((_) async {});
   }
 
   @override
@@ -147,23 +142,32 @@ class _ReminderScreenState extends ConsumerState<ReminderScreen> with TickerProv
 
   List<Reminder> get _activeReminders => _filteredReminders.where((r) => !r.isCompleted).toList();
   List<Reminder> get _completedReminders => _filteredReminders.where((r) => r.isCompleted).toList();
-  final alarmSettings = AlarmSettings(
-    id: 42,
-    dateTime: DateTime.now().add(const Duration(seconds: 10)),
-    assetAudioPath: 'assets/alarm.mp3',
-    loopAudio: true,
-    vibrate: true,
-    warningNotificationOnKill: Platform.isIOS,
-    androidFullScreenIntent: true,
-    volumeSettings: VolumeSettings.fade(volume: 0.8, fadeDuration: Duration(seconds: 5), volumeEnforced: true),
-    notificationSettings: const NotificationSettings(
-      title: 'This is the title',
-      body: 'This is the body',
-      stopButton: 'Stop the alarm',
-      icon: 'notification_icon',
-      iconColor: Color(0xff862778),
-    ),
-  );
+  Future<void> showNotification() async {
+    print('Attempting to show notification...');
+    
+    const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+      'your_channel_id',
+      'your_channel_name',
+      channelDescription: 'your_channel_description',
+      importance: Importance.max,
+      priority: Priority.high,
+    );
+
+    const NotificationDetails notificationDetails = NotificationDetails(android: androidDetails);
+
+    try {
+      await main.flutterLocalNotificationsPlugin.show(
+        2, // ID ของ notification
+        'แจ้งเตือน',
+        'นี่คือข้อความแจ้งเตือน',
+        notificationDetails,
+      );
+      print('Notification sent successfully!');
+    } catch (e) {
+      print('Error showing notification: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -219,9 +223,7 @@ class _ReminderScreenState extends ConsumerState<ReminderScreen> with TickerProv
                                   ),
                                 ),
                                 InkWell(
-                                  onTap: () async {
-                                    await Alarm.set(alarmSettings: alarmSettings);
-                                  },
+                                  onTap: showNotification,
                                   child: Container(
                                     padding: EdgeInsets.all(isTablet ? 16.w : 12.w),
                                     decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(16.r)),
