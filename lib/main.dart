@@ -17,9 +17,29 @@ void main() async {
   
   // notification
   const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
-  const InitializationSettings initializationSettings = InitializationSettings(android: initializationSettingsAndroid);
   
-  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  const DarwinInitializationSettings initializationSettingsIOS = DarwinInitializationSettings(
+    requestAlertPermission: true,
+    requestBadgePermission: true,
+    requestSoundPermission: true,
+  );
+  
+  const DarwinInitializationSettings initializationSettingsMacOS = DarwinInitializationSettings(
+    requestAlertPermission: true,
+    requestBadgePermission: true,
+    requestSoundPermission: true,
+  );
+  
+  const InitializationSettings initializationSettings = InitializationSettings(
+    android: initializationSettingsAndroid,
+    iOS: initializationSettingsIOS,
+    macOS: initializationSettingsMacOS,
+  );
+  
+  await flutterLocalNotificationsPlugin.initialize(
+    initializationSettings,
+    onDidReceiveNotificationResponse: onDidReceiveNotificationResponse,
+  );
   
   // Create notification channel for Android
   const AndroidNotificationChannel channel = AndroidNotificationChannel(
@@ -37,6 +57,10 @@ void main() async {
 
   objectBox = await ObjectBoxDatabase.init();
   runApp(const ProviderScope(child: MyApp()));
+}
+
+void onDidReceiveNotificationResponse(NotificationResponse notificationResponse) async {
+  print('Notification response received: ${notificationResponse.payload}');
 }
 
 class MyApp extends ConsumerWidget {

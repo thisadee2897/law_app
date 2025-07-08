@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:law_app/components/export.dart';
@@ -113,7 +112,37 @@ class _ReminderScreenState extends ConsumerState<ReminderScreen> with TickerProv
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    WidgetsBinding.instance.addPostFrameCallback((_) async {});
+    _requestIOSPermissions();
+    
+    // Show test notification after a short delay to ensure permissions are set
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await Future.delayed(const Duration(seconds: 2));
+      await showNotification();
+    });
+  }
+
+  Future<void> _requestIOSPermissions() async {
+    print('Requesting iOS permissions...');
+    
+    // Request permissions for iOS
+    final bool? result = await main.flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()
+        ?.requestPermissions(
+          alert: true,
+          badge: true,
+          sound: true,
+        );
+    
+    print('iOS permissions result: $result');
+    
+    // Also request permissions for macOS if running on macOS
+    await main.flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<MacOSFlutterLocalNotificationsPlugin>()
+        ?.requestPermissions(
+          alert: true,
+          badge: true,
+          sound: true,
+        );
   }
 
   @override
@@ -145,21 +174,48 @@ class _ReminderScreenState extends ConsumerState<ReminderScreen> with TickerProv
   Future<void> showNotification() async {
     print('Attempting to show notification...');
     
+    // Check if we have permission on iOS
+    final iosPlugin = main.flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>();
+    
+    if (iosPlugin != null) {
+      print('Checking iOS notification permissions...');
+      final bool? hasPermission = await iosPlugin.requestPermissions(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+      print('iOS notification permission granted: $hasPermission');
+    }
+    
     const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
       'your_channel_id',
       'your_channel_name',
       channelDescription: 'your_channel_description',
       importance: Importance.max,
       priority: Priority.high,
+      playSound: true,
+      enableVibration: true,
     );
 
-    const NotificationDetails notificationDetails = NotificationDetails(android: androidDetails);
+    const DarwinNotificationDetails iosDetails = DarwinNotificationDetails(
+      presentAlert: true,
+      presentBadge: true,
+      presentSound: true,
+      badgeNumber: 1,
+      subtitle: 'การแจ้งเตือนระบบกฎหมาย',
+    );
+
+    const NotificationDetails notificationDetails = NotificationDetails(
+      android: androidDetails,
+      iOS: iosDetails,
+    );
 
     try {
       await main.flutterLocalNotificationsPlugin.show(
-        2, // ID ของ notification
+        DateTime.now().millisecondsSinceEpoch.remainder(100000), // Use unique ID
         'แจ้งเตือน',
-        'นี่คือข้อความแจ้งเตือน',
+        'นี่คือข้อความแจ้งเตือน - ${DateTime.now().toLocal()}',
         notificationDetails,
       );
       print('Notification sent successfully!');
