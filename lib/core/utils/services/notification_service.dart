@@ -35,9 +35,14 @@ class NotificationService {
       requestAlertPermission: true,
       requestBadgePermission: true,
       requestSoundPermission: true,
+      requestCriticalPermission: true,
+      requestProvisionalPermission: true,
     );
 
-    const InitializationSettings initializationSettings = InitializationSettings(android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
+    const InitializationSettings initializationSettings = InitializationSettings(
+      android: initializationSettingsAndroid, 
+      iOS: initializationSettingsIOS,
+    );
 
     await _flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
@@ -52,10 +57,18 @@ class NotificationService {
       onDidReceiveBackgroundNotificationResponse: notificationBackgroundHandler,
     );
 
+    // Request permissions explicitly
+    await requestNotificationPermissions();
+    
+    // Create notification channel for Android
+    await _createNotificationChannel();
+
     // Initializing Timezones
     tz_data.initializeTimeZones();
     final String timeZoneName = await FlutterTimezone.getLocalTimezone();
     tz.setLocalLocation(tz.getLocation(timeZoneName));
+    
+    print('NotificationService initialized successfully');
   }
 
   static Future<void> scheduleNotification(ReminderModel reminder) async {
@@ -94,7 +107,6 @@ class NotificationService {
         matchDateTimeComponents = DateTimeComponents.dateAndTime; // ทุกวันและเดือนของปีและเวลาเดิม
         break;
       case RecurrenceType.none:
-      default:
         matchDateTimeComponents = null; // ไม่เกิดซ้ำ
         break;
     }
@@ -229,7 +241,6 @@ class NotificationService {
         }
         return nextInstance;
       case RecurrenceType.none:
-      default:
         return scheduledTZ;
     }
   }
@@ -266,5 +277,86 @@ class NotificationService {
       payload: 'test_payload',
     );
     print('Attempted to show instant notification.');
+  }
+
+  /// Request notification permissions for both Android and iOS
+  static Future<bool> requestNotificationPermissions() async {
+    bool granted = false;
+    
+    // For Android 13+ (API level 33+)
+    final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
+        _flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>();
+
+    if (androidImplementation != null) {
+      final bool? androidGranted = await androidImplementation.requestNotificationsPermission();
+      granted = androidGranted ?? false;
+      print('Android notification permission granted: $granted');
+    }
+
+    // For iOS
+    final IOSFlutterLocalNotificationsPlugin? iosImplementation =
+        _flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
+            IOSFlutterLocalNotificationsPlugin>();
+
+    if (iosImplementation != null) {
+      final bool? iosGranted = await iosImplementation.requestPermissions(
+        alert: true,
+        badge: true,
+        sound: true,
+        critical: true,
+      );
+      granted = iosGranted ?? granted;
+      print('iOS notification permission granted: $iosGranted');
+    }
+
+    return granted;
+  }
+
+  /// Create notification channel for Android
+  static Future<void> _createNotificationChannel() async {
+    const AndroidNotificationChannel channel = AndroidNotificationChannel(
+      'reminder_channel_id',
+      'Reminder Channel',
+      description: 'Channel for reminder notifications',
+      importance: Importance.high,
+      enableVibration: true,
+      playSound: true,
+    );
+
+    final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
+        _flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>();
+
+    await androidImplementation?.createNotificationChannel(channel);
+    print('Notification channel created: ${channel.id}');
+  }
+
+  /// Check if notifications are enabled
+  static Future<bool> areNotificationsEnabled() async {
+    final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
+        _flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>();
+
+    if (androidImplementation != null) {
+      final bool? enabled = await androidImplementation.areNotificationsEnabled();
+      return enabled ?? false;
+    }
+
+    final IOSFlutterLocalNotificationsPlugin? iosImplementation =
+        _flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
+            IOSFlutterLocalNotificationsPlugin>();
+
+    if (iosImplementation != null) {
+      final permissions = await iosImplementation.checkPermissions();
+      return permissions?.isEnabled ?? false;
+    }
+
+    return false;
+  }
+
+  /// Get pending notifications for debugging
+  static Future<List<PendingNotificationRequest>> getPendingNotifications() async {
+    return await _flutterLocalNotificationsPlugin.pendingNotificationRequests();
   }
 }

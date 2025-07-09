@@ -4,6 +4,7 @@ import 'package:law_app/components/export.dart';
 import 'package:law_app/core/database/models/reminder_model.dart';
 import 'package:law_app/features/reminder/providers/reminder_provider.dart';
 import 'package:law_app/features/reminder/views/add_edit_reminder_screen.dart';
+import 'package:law_app/features/settings/views/notification_settings_screen.dart';
 
 class ReminderScreen extends ConsumerWidget {
   const ReminderScreen({super.key});
@@ -41,6 +42,18 @@ class ReminderScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('แอปเตือนความจำ'),
         actions: [
+          // Settings button for notifications
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const NotificationSettingsScreen(),
+                ),
+              );
+            },
+          ),
           // testNotificationButton
           IconButton(
             icon: const Icon(Icons.notifications),
