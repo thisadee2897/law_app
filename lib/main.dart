@@ -12,28 +12,48 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.remove();
   
-  // Initialize notification service
-  await NotificationService.init();
-  
-  // Initialize ObjectBox database
-  await ObjectBoxDatabase.init();
-  
-  // Check notification permissions
-  final isEnabled = await NotificationService.areNotificationsEnabled();
-  print('Notifications enabled: $isEnabled');
-  
-  // Test notification to verify it's working
-  await NotificationService.showInstantNotification(); 
-  
-  // Reschedule all active reminders
-  final allReminders = ObjectBoxDatabase.instance.reminderBox.getAll();
-  print('Found ${allReminders.length} reminders in database');
-  
-  for (var reminder in allReminders) {
-    if (reminder.isActive) {
-      await NotificationService.scheduleNotification(reminder);
-      print('Rescheduled reminder: ${reminder.title}');
+  try {
+    // Initialize notification service
+    await NotificationService.init();
+    print('✅ NotificationService initialized successfully');
+    
+    // Initialize ObjectBox database
+    await ObjectBoxDatabase.init();
+    print('✅ ObjectBox database initialized successfully');
+    
+    // Check notification permissions
+    final isEnabled = await NotificationService.areNotificationsEnabled();
+    print('📱 Notifications enabled: $isEnabled');
+    
+    // Test notification to verify it's working (only if enabled)
+    if (isEnabled) {
+      await NotificationService.showInstantNotification();
+      print('🔔 Test notification sent');
+    } else {
+      print('⚠️ Notifications not enabled - skipping test notification');
     }
+    
+    // Reschedule all active reminders
+    final allReminders = ObjectBoxDatabase.instance.reminderBox.getAll();
+    print('📋 Found ${allReminders.length} reminders in database');
+    
+    int rescheduledCount = 0;
+    for (var reminder in allReminders) {
+      if (reminder.isActive) {
+        try {
+          await NotificationService.scheduleNotification(reminder);
+          rescheduledCount++;
+          print('✅ Rescheduled reminder: ${reminder.title}');
+        } catch (e) {
+          print('❌ Failed to reschedule reminder ${reminder.title}: $e');
+        }
+      }
+    }
+    
+    print('🎯 Successfully rescheduled $rescheduledCount active reminders');
+    
+  } catch (e) {
+    print('❌ Error during app initialization: $e');
   }
 
   runApp(const ProviderScope(child: MyApp()));
