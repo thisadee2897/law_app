@@ -1,4 +1,4 @@
-package com.example.law_app
+package com.SafeDoc
 
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine

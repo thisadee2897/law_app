@@ -113,9 +113,19 @@ dev_dependencies:
   # ObjectBox
   objectbox_generator: ^4.0.3
 
+  #icons
+  flutter_launcher_icons: ^0.14.3
+
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
-
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/iconAppSafedoc.png"
+  adaptive_icon_background: "#FF0000"
+  adaptive_icon_foreground: "assets/images/iconAppSafedoc.png"
+  remove_alpha_ios: true
+# dart run flutter_launcher_icons
 # The following section is specific to Flutter packages.
 flutter:
   # The following line ensures that the Material Icons font is
