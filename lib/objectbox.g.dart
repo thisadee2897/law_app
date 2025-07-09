@@ -16,6 +16,7 @@ import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 
 import 'core/database/models/category_form_model.dart';
 import 'core/database/models/form_model.dart';
+import 'core/database/models/reminder_model.dart';
 
 export 'package:objectbox/objectbox.dart'; // so that callers only have to import this file
 
@@ -156,6 +157,70 @@ final _entities = <obx_int.ModelEntity>[
     relations: <obx_int.ModelRelation>[],
     backlinks: <obx_int.ModelBacklink>[],
   ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(3, 7187505148755701870),
+    name: 'ReminderModel',
+    lastPropertyId: const obx_int.IdUid(9, 5584614030423925797),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 854972989722189651),
+        name: 'id',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 1041922361608862614),
+        name: 'title',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 3945120066933366867),
+        name: 'description',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 9058060087096129080),
+        name: 'scheduledTime',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(5, 6554830398219416046),
+        name: 'isActive',
+        type: 1,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(7, 2821629508615701923),
+        name: 'dayOfWeek',
+        type: 6,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(8, 4167313058110159128),
+        name: 'dayOfMonth',
+        type: 6,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(9, 5584614030423925797),
+        name: 'monthOfYear',
+        type: 6,
+        flags: 0,
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[
+      obx_int.ModelRelation(
+        id: const obx_int.IdUid(1, 1544439155127848499),
+        name: 'forms',
+        targetId: const obx_int.IdUid(2, 840176663917475305),
+      ),
+    ],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
 ];
 
 /// Shortcut for [obx.Store.new] that passes [getObjectBoxModel] and for Flutter
@@ -196,13 +261,13 @@ Future<obx.Store> openStore({
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
     entities: _entities,
-    lastEntityId: const obx_int.IdUid(2, 840176663917475305),
+    lastEntityId: const obx_int.IdUid(3, 7187505148755701870),
     lastIndexId: const obx_int.IdUid(1, 1704605792094889468),
-    lastRelationId: const obx_int.IdUid(0, 0),
+    lastRelationId: const obx_int.IdUid(1, 1544439155127848499),
     lastSequenceId: const obx_int.IdUid(0, 0),
     retiredEntityUids: const [],
     retiredIndexUids: const [],
-    retiredPropertyUids: const [],
+    retiredPropertyUids: const [2552761711904012150],
     retiredRelationUids: const [],
     modelVersion: 5,
     modelVersionParserMinimum: 5,
@@ -404,6 +469,89 @@ obx_int.ModelDefinition getObjectBoxModel() {
         return object;
       },
     ),
+    ReminderModel: obx_int.EntityDefinition<ReminderModel>(
+      model: _entities[2],
+      toOneRelations: (ReminderModel object) => [],
+      toManyRelations: (ReminderModel object) => {
+        obx_int.RelInfo<ReminderModel>.toMany(1, object.id): object.forms,
+      },
+      getId: (ReminderModel object) => object.id,
+      setId: (ReminderModel object, int id) {
+        object.id = id;
+      },
+      objectToFB: (ReminderModel object, fb.Builder fbb) {
+        final titleOffset = fbb.writeString(object.title);
+        final descriptionOffset = fbb.writeString(object.description);
+        final scheduledTimeOffset = fbb.writeString(object.scheduledTime);
+        fbb.startTable(10);
+        fbb.addInt64(0, object.id);
+        fbb.addOffset(1, titleOffset);
+        fbb.addOffset(2, descriptionOffset);
+        fbb.addOffset(3, scheduledTimeOffset);
+        fbb.addBool(4, object.isActive);
+        fbb.addInt64(6, object.dayOfWeek);
+        fbb.addInt64(7, object.dayOfMonth);
+        fbb.addInt64(8, object.monthOfYear);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final idParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
+        final descriptionParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 8, '');
+        final titleParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 6, '');
+        final scheduledTimeParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 10, '');
+        final isActiveParam = const fb.BoolReader().vTableGet(
+          buffer,
+          rootOffset,
+          12,
+          false,
+        );
+        final dayOfWeekParam = const fb.Int64Reader().vTableGetNullable(
+          buffer,
+          rootOffset,
+          16,
+        );
+        final dayOfMonthParam = const fb.Int64Reader().vTableGetNullable(
+          buffer,
+          rootOffset,
+          18,
+        );
+        final monthOfYearParam = const fb.Int64Reader().vTableGetNullable(
+          buffer,
+          rootOffset,
+          20,
+        );
+        final object = ReminderModel(
+          id: idParam,
+          description: descriptionParam,
+          title: titleParam,
+          scheduledTime: scheduledTimeParam,
+          isActive: isActiveParam,
+          dayOfWeek: dayOfWeekParam,
+          dayOfMonth: dayOfMonthParam,
+          monthOfYear: monthOfYearParam,
+        );
+        obx_int.InternalToManyAccess.setRelInfo<ReminderModel>(
+          object.forms,
+          store,
+          obx_int.RelInfo<ReminderModel>.toMany(1, object.id),
+        );
+        return object;
+      },
+    ),
   };
 
   return obx_int.ModelDefinition(model, bindings);
@@ -507,5 +655,53 @@ class FormModel_ {
   /// See [FormModel.code].
   static final code = obx.QueryStringProperty<FormModel>(
     _entities[1].properties[10],
+  );
+}
+
+/// [ReminderModel] entity fields to define ObjectBox queries.
+class ReminderModel_ {
+  /// See [ReminderModel.id].
+  static final id = obx.QueryIntegerProperty<ReminderModel>(
+    _entities[2].properties[0],
+  );
+
+  /// See [ReminderModel.title].
+  static final title = obx.QueryStringProperty<ReminderModel>(
+    _entities[2].properties[1],
+  );
+
+  /// See [ReminderModel.description].
+  static final description = obx.QueryStringProperty<ReminderModel>(
+    _entities[2].properties[2],
+  );
+
+  /// See [ReminderModel.scheduledTime].
+  static final scheduledTime = obx.QueryStringProperty<ReminderModel>(
+    _entities[2].properties[3],
+  );
+
+  /// See [ReminderModel.isActive].
+  static final isActive = obx.QueryBooleanProperty<ReminderModel>(
+    _entities[2].properties[4],
+  );
+
+  /// See [ReminderModel.dayOfWeek].
+  static final dayOfWeek = obx.QueryIntegerProperty<ReminderModel>(
+    _entities[2].properties[5],
+  );
+
+  /// See [ReminderModel.dayOfMonth].
+  static final dayOfMonth = obx.QueryIntegerProperty<ReminderModel>(
+    _entities[2].properties[6],
+  );
+
+  /// See [ReminderModel.monthOfYear].
+  static final monthOfYear = obx.QueryIntegerProperty<ReminderModel>(
+    _entities[2].properties[7],
+  );
+
+  /// see [ReminderModel.forms]
+  static final forms = obx.QueryRelationToMany<ReminderModel, FormModel>(
+    _entities[2].relations[0],
   );
 }

@@ -1,66 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:law_app/core/database/objectbox_database.dart';
+import 'package:law_app/core/utils/services/notification_service.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
-import 'package:timezone/data/latest_all.dart' as tz;
 
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-late ObjectBoxDatabase objectBox;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.remove();
-  
-  // notification
-  const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
-  
-  const DarwinInitializationSettings initializationSettingsIOS = DarwinInitializationSettings(
-    requestAlertPermission: true,
-    requestBadgePermission: true,
-    requestSoundPermission: true,
-  );
-  
-  const DarwinInitializationSettings initializationSettingsMacOS = DarwinInitializationSettings(
-    requestAlertPermission: true,
-    requestBadgePermission: true,
-    requestSoundPermission: true,
-  );
-  
-  const InitializationSettings initializationSettings = InitializationSettings(
-    android: initializationSettingsAndroid,
-    iOS: initializationSettingsIOS,
-    macOS: initializationSettingsMacOS,
-  );
-  
-  await flutterLocalNotificationsPlugin.initialize(
-    initializationSettings,
-    onDidReceiveNotificationResponse: onDidReceiveNotificationResponse,
-  );
-  
-  // Create notification channel for Android
-  const AndroidNotificationChannel channel = AndroidNotificationChannel(
-    'your_channel_id',
-    'your_channel_name',
-    description: 'your_channel_description',
-    importance: Importance.max,
-  );
+  await NotificationService.init();
+  await ObjectBoxDatabase.init();
+  await NotificationService.showInstantNotification(); 
+  final allReminders = ObjectBoxDatabase.instance.reminderBox.getAll();
+  for (var reminder in allReminders) {
+    if (reminder.isActive) {
+      await NotificationService.scheduleNotification(reminder);
+    }
+  }
 
-  await flutterLocalNotificationsPlugin
-      .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
-      ?.createNotificationChannel(channel);
-
-  tz.initializeTimeZones();
-
-  objectBox = await ObjectBoxDatabase.init();
   runApp(const ProviderScope(child: MyApp()));
-}
-
-void onDidReceiveNotificationResponse(NotificationResponse notificationResponse) async {
-  print('Notification response received: ${notificationResponse.payload}');
 }
 
 class MyApp extends ConsumerWidget {

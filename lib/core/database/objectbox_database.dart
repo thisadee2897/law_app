@@ -5,6 +5,8 @@ import 'package:path_provider/path_provider.dart';
 import 'repositories/form_box_manager.dart';
 import 'package:path/path.dart' show join;
 
+import 'repositories/remider_box_manager.dart';
+
 class ObjectBoxDatabase {
   static late final ObjectBoxDatabase _instance;
   static ObjectBoxDatabase get instance => _instance;
@@ -13,6 +15,7 @@ class ObjectBoxDatabase {
 
   late final CategoryFormBoxManager categoryFormBoxManager;
   late final FormBoxManager formBoxManager;
+  late final ReminderBoxManager reminderBox;
   // late final UnitBoxManager units;
   // late final PropertyBoxManager properties;
   // late final PropertyValueBoxManager propertyValues;
@@ -23,6 +26,7 @@ class ObjectBoxDatabase {
   ObjectBoxDatabase._(this._store) {
     categoryFormBoxManager = CategoryFormBoxManager(_store);
     formBoxManager = FormBoxManager(_store);
+    reminderBox = ReminderBoxManager(_store);
   }
 
   static Future<ObjectBoxDatabase> init() async {

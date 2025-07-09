@@ -113,17 +113,74 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "3:7187505148755701870",
+      "lastPropertyId": "9:5584614030423925797",
+      "name": "ReminderModel",
+      "properties": [
+        {
+          "id": "1:854972989722189651",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:1041922361608862614",
+          "name": "title",
+          "type": 9
+        },
+        {
+          "id": "3:3945120066933366867",
+          "name": "description",
+          "type": 9
+        },
+        {
+          "id": "4:9058060087096129080",
+          "name": "scheduledTime",
+          "type": 9
+        },
+        {
+          "id": "5:6554830398219416046",
+          "name": "isActive",
+          "type": 1
+        },
+        {
+          "id": "7:2821629508615701923",
+          "name": "dayOfWeek",
+          "type": 6
+        },
+        {
+          "id": "8:4167313058110159128",
+          "name": "dayOfMonth",
+          "type": 6
+        },
+        {
+          "id": "9:5584614030423925797",
+          "name": "monthOfYear",
+          "type": 6
+        }
+      ],
+      "relations": [
+        {
+          "id": "1:1544439155127848499",
+          "name": "forms",
+          "targetId": "2:840176663917475305"
+        }
+      ]
     }
   ],
-  "lastEntityId": "2:840176663917475305",
+  "lastEntityId": "3:7187505148755701870",
   "lastIndexId": "1:1704605792094889468",
-  "lastRelationId": "0:0",
+  "lastRelationId": "1:1544439155127848499",
   "lastSequenceId": "0:0",
   "modelVersion": 5,
   "modelVersionParserMinimum": 5,
   "retiredEntityUids": [],
   "retiredIndexUids": [],
-  "retiredPropertyUids": [],
+  "retiredPropertyUids": [
+    2552761711904012150
+  ],
   "retiredRelationUids": [],
   "version": 1
 }

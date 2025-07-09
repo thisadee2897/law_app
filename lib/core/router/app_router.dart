@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:law_app/core/router/route_config.dart';
 import 'package:law_app/features/form/views/pdf_screen.dart';
 import 'package:law_app/features/home/views/home_screen.dart';
-import 'package:law_app/features/reminder/views/create_and_update_reminder_screen.dart';
+// import 'package:law_app/features/reminder/views/create_and_update_reminder_screen.dart';
 import 'package:law_app/features/reminder/views/reminder_screen.dart';
 import 'boxmain.dart';
 
@@ -38,7 +38,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 path: Routes.reminder,
                 pageBuilder: (context, state) => NoTransitionPage(child: ReminderScreen()),
                 routes: [
-                  GoRoute(path: Routes.createOrUpdateReminder, pageBuilder: (context, state) => NoTransitionPage(child: CreateAndUpdateReminderScreen())),
+                  // GoRoute(path: Routes.createOrUpdateReminder, pageBuilder: (context, state) => NoTransitionPage(child: CreateAndUpdateReminderScreen())),
                 ],
               ),
             ],
