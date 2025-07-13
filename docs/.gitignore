@@ -1,0 +1,7 @@
+# iOS builds
+*.ipa
+*.dSYM.zip
+
+# Keep docs folder structure
+!docs/
+docs/*.ipa

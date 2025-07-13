@@ -1,0 +1,13 @@
+# SafeDoc iOS App Package
+
+This is a placeholder file for the iOS app package.
+To use this installation system, you need to:
+
+1. Build your iOS app with a valid developer/enterprise certificate
+2. Generate a signed .ipa file
+3. Replace this file with your actual SafeDoc.ipa
+
+File should be named: SafeDoc.ipa
+Location: /docs/SafeDoc.ipa
+
+Build command: flutter build ipa --release

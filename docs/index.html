@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ติดตั้ง SafeDoc App</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        .app-icon {
+            width: 120px;
+            height: 120px;
+            background: white;
+            border-radius: 25px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+        .install-btn {
+            background: #007AFF;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            margin: 20px 0;
+            box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        .install-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 122, 255, 0.4);
+        }
+        .warning {
+            background: rgba(255, 193, 7, 0.2);
+            border: 1px solid #ffc107;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+        .steps {
+            text-align: left;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .step {
+            margin: 10px 0;
+            padding: 5px 0;
+        }
+        h1 { margin-bottom: 10px; }
+        h2 { color: #ffc107; margin-top: 30px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="app-icon">⚖️</div>
+        <h1>SafeDoc</h1>
+        <p>แอปพลิเคชันจัดการการแจ้งเตือนทางกฎหมาย</p>
+        
+        <div class="warning">
+            <strong>⚠️ สำคัญ:</strong> แอปนี้เป็นเวอร์ชันทดสอบ คุณต้องไว้วางใจการติดตั้งจากแหล่งที่ไม่รู้จักในการตั้งค่า iOS
+        </div>
+
+        <a href="itms-services://?action=download-manifest&url=https://thisadee2897.github.io/law_app/manifest.plist" 
+           class="install-btn">
+            📱 ติดตั้งบน iOS
+        </a>
+
+        <h2>📋 วิธีการติดตั้ง</h2>
+        <div class="steps">
+            <div class="step"><strong>1.</strong> กดปุ่ม "ติดตั้งบน iOS" ด้านบน</div>
+            <div class="step"><strong>2.</strong> เลือก "ติดตั้ง" เมื่อแสดงป๊อปอัพ</div>
+            <div class="step"><strong>3.</strong> ไปที่ การตั้งค่า → ทั่วไป → การจัดการอุปกรณ์และ VPN</div>
+            <div class="step"><strong>4.</strong> เลือกโปรไฟล์ SafeDoc และกด "ไว้วางใจ"</div>
+            <div class="step"><strong>5.</strong> กลับไปที่หน้าจอหลักและเปิดแอป SafeDoc</div>
+        </div>
+
+        <h2>📱 ความต้องการระบบ</h2>
+        <div class="steps">
+            <div class="step">• iOS 11.0 หรือใหม่กว่า</div>
+            <div class="step">• iPhone, iPad, หรือ iPod touch</div>
+            <div class="step">• การเชื่อมต่ออินเทอร์เน็ต</div>
+        </div>
+
+        <p style="margin-top: 30px; font-size: 14px; opacity: 0.8;">
+            เวอร์ชัน 0.0.1 | สร้างด้วย Flutter
+        </p>
+    </div>
+</body>
+</html>
