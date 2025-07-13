@@ -13,4 +13,19 @@ class ReminderBoxManager {
   void update(ReminderModel reminder) => _reminderBox.put(reminder);
   void delete(int id) => _reminderBox.remove(id);
   void deleteMany(List<int> ids) => _reminderBox.removeMany(ids);
+  void removeFormsWhenIdNotInList(List<int> formIds) {
+    if (formIds.isEmpty) {
+      final allReminders = _reminderBox.getAll();
+      for (var reminder in allReminders) {
+        reminder.forms.clear();
+        _reminderBox.put(reminder);
+      }
+      return;
+    }
+    final allReminders = _reminderBox.getAll();
+    for (var reminder in allReminders) {
+      reminder.forms.removeWhere((form) => !formIds.contains(form.id));
+      _reminderBox.put(reminder);
+    }
+  }
 }

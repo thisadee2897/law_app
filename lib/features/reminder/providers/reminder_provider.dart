@@ -29,6 +29,7 @@ class ReminderNotifier {
     int? dayOfWeek,
     int? dayOfMonth,
     int? monthOfYear,
+    List<int>? selectedFormIds,
   ) async {
     //     final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
     // // current time's offset in milliseconds from UTC
@@ -46,6 +47,19 @@ class ReminderNotifier {
       dayOfMonth: dayOfMonth,
       monthOfYear: monthOfYear,
     );
+
+    // Clear existing forms and add selected forms
+    newReminder.forms.clear();
+    if (selectedFormIds != null && selectedFormIds.isNotEmpty) {
+      final formBoxManager = ObjectBoxDatabase.instance.formBoxManager;
+      for (int formId in selectedFormIds) {
+        final form = formBoxManager.get(formId);
+        if (form != null) {
+          newReminder.forms.add(form);
+        }
+      }
+    }
+
     _reminderBoxManager.add(newReminder);
 
     if (newReminder.isActive) {
@@ -63,6 +77,7 @@ class ReminderNotifier {
     int? newDayOfWeek,
     int? newDayOfMonth,
     int? newMonthOfYear,
+    List<int>? selectedFormIds,
   ) async {
     //         final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
     // // current time's offset in milliseconds from UTC
@@ -85,6 +100,19 @@ class ReminderNotifier {
         dayOfMonth: newDayOfMonth,
         monthOfYear: newMonthOfYear,
       );
+
+      // Update forms relationship
+      updatedReminder.forms.clear();
+      _reminderBoxManager.removeFormsWhenIdNotInList(selectedFormIds?.map((e) => e).toList() ?? []);
+      if (selectedFormIds != null && selectedFormIds.isNotEmpty) {
+        final formBoxManager = ObjectBoxDatabase.instance.formBoxManager;
+        for (int formId in selectedFormIds) {
+          final form = formBoxManager.get(formId);
+          if (form != null) {
+            updatedReminder.forms.add(form);
+          }
+        }
+      }
       _reminderBoxManager.update(updatedReminder);
 
       await NotificationService.cancelNotification(updatedReminder.id);

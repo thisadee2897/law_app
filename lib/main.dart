@@ -26,12 +26,12 @@ void main() async {
     print('📱 Notifications enabled: $isEnabled');
     
     // Test notification to verify it's working (only if enabled)
-    if (isEnabled) {
-      await NotificationService.showInstantNotification();
-      print('🔔 Test notification sent');
-    } else {
-      print('⚠️ Notifications not enabled - skipping test notification');
-    }
+    // if (isEnabled) {
+    //   await NotificationService.showInstantNotification();
+    //   print('🔔 Test notification sent');
+    // } else {
+    //   print('⚠️ Notifications not enabled - skipping test notification');
+    // }
     
     // Reschedule all active reminders
     final allReminders = ObjectBoxDatabase.instance.reminderBox.getAll();
