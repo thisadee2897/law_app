@@ -82,8 +82,6 @@ class _HomeScreenMobileWidgetsState extends ConsumerState<HomeScreenMobileWidget
                                   await file.delete();
                                 }
                                 await file.writeAsBytes(bytes);
-                                // ref.read(pdfTempFilePathProvider.notifier).state = file.path;
-                                // ref.goSubPath(Routes.pdf);
                                 await OpenFile.open(file.path);
                               } catch (e) {
                                 // Show error dialog

@@ -20,6 +20,8 @@ class AddEditReminderState {
   final bool isInitialized;
   final String? titleError;
   final String? dateTimeError;
+  // status เลยเวลายัง
+  final bool isOverdue;
 
   AddEditReminderState({
     required this.titleController,
@@ -36,14 +38,11 @@ class AddEditReminderState {
     this.isInitialized = false,
     this.titleError,
     this.dateTimeError,
+    this.isOverdue = false,
   });
 
   bool get canSave {
-    return titleController.text.trim().isNotEmpty &&
-           selectedDateTime != null &&
-           titleError == null &&
-           dateTimeError == null &&
-           !isLoading;
+    return titleController.text.trim().isNotEmpty && selectedDateTime != null && titleError == null && dateTimeError == null && !isLoading;
   }
 
   AddEditReminderState copyWith({
@@ -83,18 +82,17 @@ class AddEditReminderState {
       isInitialized: isInitialized ?? this.isInitialized,
       titleError: clearTitleError ? null : (titleError ?? this.titleError),
       dateTimeError: clearDateTimeError ? null : (dateTimeError ?? this.dateTimeError),
+      isOverdue: selectedDateTime != null && selectedDateTime.isBefore(DateTime.now()),
     );
   }
 }
 
 // Notifier
 class AddEditReminderNotifier extends StateNotifier<AddEditReminderState> {
-  AddEditReminderNotifier() : super(AddEditReminderState(
-    titleController: TextEditingController(),
-    descriptionController: TextEditingController(),
-    availablePdfs: [],
-    selectedPdfs: [],
-  )) {
+  AddEditReminderNotifier()
+    : super(
+        AddEditReminderState(titleController: TextEditingController(), descriptionController: TextEditingController(), availablePdfs: [], selectedPdfs: []),
+      ) {
     _loadAvailablePdfs();
   }
 
@@ -106,7 +104,7 @@ class AddEditReminderNotifier extends StateNotifier<AddEditReminderState> {
   }
 
   bool get isInitialized => state.isInitialized;
-  set isInitialized (bool value) {
+  set isInitialized(bool value) {
     state = state.copyWith(isInitialized: value);
   }
 
@@ -115,6 +113,11 @@ class AddEditReminderNotifier extends StateNotifier<AddEditReminderState> {
       final database = ObjectBoxDatabase.instance;
       final pdfs = database.formBoxManager.getAll();
       state = state.copyWith(availablePdfs: pdfs);
+      // sort by favorite first
+      state.availablePdfs.sort((a, b) {
+        if (b.favorite == a.favorite) return 0;
+        return b.favorite ? 1 : -1;
+      });
     } catch (e) {
       // Handle error
       print('Error loading PDFs: $e');
@@ -122,11 +125,28 @@ class AddEditReminderNotifier extends StateNotifier<AddEditReminderState> {
   }
 
   void initializeForAdd() {
-    if (state.isInitialized) return;
     final defaultDateTime = DateTime.now().add(const Duration(minutes: 5));
+    // state.titleController.text = '';
+    // state.descriptionController.text = '';
     state = state.copyWith(
+      descriptionController: TextEditingController(text: ''),
+      titleController: TextEditingController(text: ''),
+      recurrenceType: 'none',
+      selectedDayOfWeek: null,
+      selectedDayOfMonth: null,
+      selectedMonthOfYear: null,
+      isActive: true,
+      selectedPdfs: [],
       selectedDateTime: defaultDateTime,
       isInitialized: true,
+      titleError: null,
+      dateTimeError: null,
+      clearSelectedDateTime: true,
+      clearSelectedDayOfWeek: true,
+      clearSelectedDayOfMonth: true,
+      clearSelectedMonthOfYear: true,
+      clearTitleError: true,
+      clearDateTimeError: true,
     );
   }
 
@@ -135,7 +155,7 @@ class AddEditReminderNotifier extends StateNotifier<AddEditReminderState> {
 
     state.titleController.text = reminder.title;
     state.descriptionController.text = reminder.description;
-    
+
     // Convert RecurrenceType enum to string
     String recurrenceType;
     switch (reminder.recurrenceType) {
@@ -165,15 +185,11 @@ class AddEditReminderNotifier extends StateNotifier<AddEditReminderState> {
       isActive: reminder.isActive,
       selectedPdfs: reminder.forms.toList(), // Load existing selected forms
       isInitialized: true,
-      
     );
   }
 
   void setTitle(String title) {
-    state = state.copyWith(
-      titleError: title.trim().isEmpty ? 'กรุณาใส่ชื่อเตือนความจำ' : null,
-      clearTitleError: title.trim().isNotEmpty,
-    );
+    state = state.copyWith(titleError: title.trim().isEmpty ? 'กรุณาใส่ชื่อเตือนความจำ' : null, clearTitleError: title.trim().isNotEmpty);
   }
 
   void setDescription(String description) {
@@ -181,10 +197,7 @@ class AddEditReminderNotifier extends StateNotifier<AddEditReminderState> {
   }
 
   void setSelectedDateTime(DateTime dateTime) {
-    state = state.copyWith(
-      selectedDateTime: dateTime,
-      clearDateTimeError: true,
-    );
+    state = state.copyWith(selectedDateTime: dateTime, clearDateTimeError: true);
   }
 
   void setRecurrenceType(String type) {
@@ -205,10 +218,7 @@ class AddEditReminderNotifier extends StateNotifier<AddEditReminderState> {
           state = state.copyWith(selectedDayOfMonth: state.selectedDateTime!.day);
           break;
         case 'yearly':
-          state = state.copyWith(
-            selectedDayOfMonth: state.selectedDateTime!.day,
-            selectedMonthOfYear: state.selectedDateTime!.month,
-          );
+          state = state.copyWith(selectedDayOfMonth: state.selectedDateTime!.day, selectedMonthOfYear: state.selectedDateTime!.month);
           break;
       }
     }
@@ -268,10 +278,7 @@ class AddEditReminderNotifier extends StateNotifier<AddEditReminderState> {
       dateTimeError = 'กรุณาเลือกเวลาในอนาคต';
     }
 
-    state = state.copyWith(
-      titleError: titleError,
-      dateTimeError: dateTimeError,
-    );
+    state = state.copyWith(titleError: titleError, dateTimeError: dateTimeError);
 
     return titleError == null && dateTimeError == null;
   }
@@ -303,25 +310,11 @@ final addEditReminderProvider = StateNotifierProvider<AddEditReminderNotifier, A
 
 // Helper providers
 final recurrenceNamesProvider = Provider<Map<String, String>>((ref) {
-  return {
-    'none': 'ไม่ต้องทำซ้ำ',
-    'daily': 'ทุกวัน',
-    'weekly': 'ทุกสัปดาห์',
-    'monthly': 'ทุกเดือน',
-    'yearly': 'ทุกปี',
-  };
+  return {'none': 'ไม่ต้องทำซ้ำ', 'daily': 'ทุกวัน', 'weekly': 'ทุกสัปดาห์', 'monthly': 'ทุกเดือน', 'yearly': 'ทุกปี'};
 });
 
 final weekdayNamesProvider = Provider<Map<int, String>>((ref) {
-  return {
-    1: 'จันทร์',
-    2: 'อังคาร',
-    3: 'พุธ',
-    4: 'พฤหัสบดี',
-    5: 'ศุกร์',
-    6: 'เสาร์',
-    7: 'อาทิตย์',
-  };
+  return {1: 'จันทร์', 2: 'อังคาร', 3: 'พุธ', 4: 'พฤหัสบดี', 5: 'ศุกร์', 6: 'เสาร์', 7: 'อาทิตย์'};
 });
 
 final monthNamesProvider = Provider<Map<int, String>>((ref) {

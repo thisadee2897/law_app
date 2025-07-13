@@ -295,7 +295,7 @@ class _ReminderScreenState extends ConsumerState<ReminderScreen> {
 
   void _navigateToAdd(BuildContext context) {
     ref.read(addEditReminderProvider.notifier).isInitialized = true;
-    Navigator.of(context).push(MaterialPageRoute(builder: (context) => const AddEditReminderScreen(reminder: null,)));
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) => AddEditReminderScreen(reminder: null)));
   }
 
   void _navigateToEdit(BuildContext context, ReminderModel reminder) {
@@ -347,14 +347,6 @@ class _ReminderScreenState extends ConsumerState<ReminderScreen> {
             },
             tooltip: 'ตั้งค่าการแจ้งเตือน',
           ),
-          IconButton(
-            icon: const Icon(Icons.notifications),
-            onPressed: () {
-              reminderNotifier.testNotification();
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('ส่งการแจ้งเตือนทดสอบแล้ว')));
-            },
-            tooltip: 'ทดสอบการแจ้งเตือน',
-          ),
         ],
       ),
       body: reminderListAsync.when(
@@ -362,17 +354,22 @@ class _ReminderScreenState extends ConsumerState<ReminderScreen> {
           if (reminders.isEmpty) {
             return _buildEmptyState(context);
           }
-
           // Sort reminders by scheduled time
           final sortedReminders = List<ReminderModel>.from(reminders)..sort((a, b) => a.getScheduledDateTime.compareTo(b.getScheduledDateTime));
 
-          return ListView.builder(
-            padding: const EdgeInsets.only(top: 8, bottom: 100),
-            itemCount: sortedReminders.length,
-            itemBuilder: (context, index) {
-              final reminder = sortedReminders[index];
-              return _buildReminderCard(context, reminder, reminderNotifier);
+          return RefreshIndicator(
+            onRefresh: () async {
+              await Future.delayed(const Duration(seconds: 1));
+              await ref.read(reminderListProvider.future);
             },
+            child: ListView.builder(
+              padding: const EdgeInsets.only(top: 8, bottom: 100),
+              itemCount: sortedReminders.length,
+              itemBuilder: (context, index) {
+                final reminder = sortedReminders[index];
+                return _buildReminderCard(context, reminder, reminderNotifier);
+              },
+            ),
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -399,13 +396,16 @@ class _ReminderScreenState extends ConsumerState<ReminderScreen> {
               ),
             ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _navigateToAdd(context),
-        icon: const Icon(Icons.add),
-        label: const Text('เพิ่มเตือนความจำ'),
-        backgroundColor: theme.primaryColor,
-        foregroundColor: theme.colorScheme.onPrimary,
-      ),
+      floatingActionButton:
+          reminderListAsync.value?.isEmpty == true
+              ? null
+              : FloatingActionButton.extended(
+                onPressed: () => _navigateToAdd(context),
+                icon: const Icon(Icons.add),
+                label: const Text('เพิ่มเตือนความจำ'),
+                backgroundColor: theme.primaryColor,
+                foregroundColor: theme.colorScheme.onPrimary,
+              ),
     );
   }
 }
