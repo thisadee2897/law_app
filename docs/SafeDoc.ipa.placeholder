@@ -1,13 +1,43 @@
 # SafeDoc iOS App Package
 
 This is a placeholder file for the iOS app package.
-To use this installation system, you need to:
 
-1. Build your iOS app with a valid developer/enterprise certificate
-2. Generate a signed .ipa file
-3. Replace this file with your actual SafeDoc.ipa
+## 📁 ตำแหน่งไฟล์ .ipa หลังจาก build:
+
+เมื่อคุณรัน `flutter build ipa --release` ไฟล์จะอยู่ที่:
+- `build/ios/ipa/SafeDoc.ipa` (หากสำเร็จ)
+
+หรือหากไม่สำเร็จเนื่องจากไม่มี signing certificate:
+- สามารถใช้ไฟล์ .app ได้: `build/ios/iphoneos/Runner.app`
+- หรือใช้ archive: `build/ios/archive/Runner.xcarchive`
+
+## 🔧 วิธีการนำไฟล์มาใช้:
+
+### ถ้ามีไฟล์ .ipa แล้ว:
+```bash
+# คัดลอกไฟล์ .ipa ไปยัง docs
+cp build/ios/ipa/SafeDoc.ipa docs/SafeDoc.ipa
+```
+
+### ถ้าไม่มี signing certificate:
+```bash
+# ใช้ไฟล์ .app แทน (แต่จะติดตั้งไม่ได้บน device จริง)
+cp -r build/ios/iphoneos/Runner.app docs/SafeDoc.app
+```
+
+## 📋 ข้อกำหนด:
+1. **สำหรับทดสอบ:** ต้องมี Developer Certificate
+2. **สำหรับ Enterprise distribution:** ต้องมี Enterprise Certificate  
+3. **สำหรับ App Store:** ต้องมี Distribution Certificate
+
+## 🚀 คำสั่ง build:
+```bash
+# สร้าง .ipa พร้อมลงนาม
+flutter build ipa --release
+
+# สร้าง .app สำหรับทดสอบ (ไม่ลงนาม)
+flutter build ios --release --no-codesign
+```
 
 File should be named: SafeDoc.ipa
 Location: /docs/SafeDoc.ipa
-
-Build command: flutter build ipa --release
