@@ -4,7 +4,7 @@ This repository contains the installation files for SafeDoc iOS app.
 
 ## Installation
 
-Visit: `https://yourusername.github.io/law_app/`
+Visit: `https://thisadee2897.github.io/law_app/`
 
 ## Files Structure
 
