@@ -4,7 +4,9 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   dynamic_color
+  flutter_timezone
   objectbox_flutter_libs
+  open_file_linux
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST
