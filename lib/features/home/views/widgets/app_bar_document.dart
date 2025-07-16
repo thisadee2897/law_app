@@ -1,6 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:law_app/components/document_card_widget.dart';
 import 'package:law_app/components/export.dart';
+import 'package:law_app/core/database/models/form_model.dart';
+import 'package:law_app/core/database/objectbox_database.dart';
 import 'package:law_app/features/home/providers/controllers/category_controller.dart';
+
+final favoriteFormsProvider = Provider.autoDispose<List<FormModel>>((ref) {
+  final database = ObjectBoxDatabase.instance;
+  return database.formBoxManager.getAll().where((form) => form.favorite).toList();
+});
 
 class AppBarDocument extends ConsumerWidget {
   const AppBarDocument({super.key, required TextEditingController searchController}) : _searchController = searchController;
@@ -45,10 +53,42 @@ class AppBarDocument extends ConsumerWidget {
                           ],
                         ),
                       ),
-                      Container(
-                        padding: EdgeInsets.all(12),
-                        decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(16)),
-                        child: Icon(Icons.folder_special, size: 32, color: Colors.yellow),
+                      GestureDetector(
+                        onTap: () {
+                          // showModalBottomSheet list data form feverite
+                          showModalBottomSheet(
+                            context: context,
+                            builder: (context) {
+                              return SizedBox(
+                                height: MediaQuery.of(context).size.height * 0.6,
+                                child: Column(
+                                  children: [
+                                    Text('Favorite Forms', style: TextStyle(fontSize: 24)),
+                                    Expanded(
+                                      child: Consumer(
+                                        builder: (context, ref, child) {
+                                          final favoriteForms = ref.watch(favoriteFormsProvider);
+                                          return ListView.builder(
+                                            itemCount: favoriteForms.length,
+                                            itemBuilder: (context, index) {
+                                              final form = favoriteForms[index];
+                                              return DocumentCardWidget(showFavoriteButton: false, form);
+                                            },
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          );
+                        },
+                        child: Container(
+                          padding: EdgeInsets.all(12),
+                          decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(16)),
+                          child: Icon(Icons.folder_special, size: 32, color: Colors.yellow),
+                        ),
                       ),
                     ],
                   ),

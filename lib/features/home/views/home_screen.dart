@@ -23,7 +23,7 @@ class _HomeScreenState extends BaseState<HomeScreen> {
 
   @override
   Widget buildTablet(BuildContext context, SizingInformation sizingInformation) {
-    return Center(child: Text('Tablet View', style: Theme.of(context).textTheme.titleLarge));
+    return HomeScreenMobileWidgets();
   }
 
   @override

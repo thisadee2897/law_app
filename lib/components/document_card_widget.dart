@@ -1,13 +1,21 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart';
 import 'package:law_app/components/export.dart';
 import 'package:law_app/core/database/models/form_model.dart';
 import 'package:law_app/core/database/objectbox_database.dart';
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
+
 // ignore: must_be_immutable
 class DocumentCardWidget extends ConsumerWidget {
   final FormModel document;
-  void Function(FormModel) onPressed;
-  DocumentCardWidget(this.document, {super.key, required this.onPressed});
+  final bool showFavoriteButton;
+  // void Function(FormModel) onPressed;
+  const DocumentCardWidget(this.document, {super.key, this.showFavoriteButton = true});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -78,6 +86,7 @@ class DocumentCardWidget extends ConsumerWidget {
                     ),
                   ),
                   // Favorite Button
+                  if(showFavoriteButton)
                   IconButton(
                     onPressed: () {
                       final database = ObjectBoxDatabase.instance;
@@ -101,14 +110,41 @@ class DocumentCardWidget extends ConsumerWidget {
               // Footer Row
               Row(
                 children: [
-                  _buildInfoChip(Icons.access_time, _formatDate(document.formUpdatedAt!.toLocal()), Colors.green),
+                  // _buildInfoChip(Icons.access_time, _formatDate(document.formUpdatedAt!.toLocal()), Colors.green),
                   const Spacer(),
                   // Action Buttons
                   Row(
                     spacing: 8.w,
                     children: [
                       // open document
-                      ElevatedButton(onPressed: () => onPressed(document), child: Text('เปิด', style: TextStyle(fontSize: 12.sp))),
+                      ElevatedButton(
+                        onPressed: () async {
+                          if (document.pdfPath.isEmpty) {
+                            _showErrorDialog('ไม่พบไฟล์ PDF สำหรับเอกสารนี้', context);
+                            return;
+                          } else {
+                            try {
+                              final byteData = await rootBundle.load(document.pdfPath);
+                              final bytes = byteData.buffer.asUint8List();
+                              final dir = await getTemporaryDirectory();
+                              final fileName = "SafeDoc_app_file_${document.code}_${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}";
+                              print('File name: $fileName');
+                              final file = File('${dir.path}/$fileName.pdf');
+                              if (await file.exists()) {
+                                await file.delete();
+                              }
+                              await file.writeAsBytes(bytes);
+                              await OpenFile.open(file.path);
+                            } catch (e) {
+                              // Show error dialog
+                              if (context.mounted) {
+                                _showErrorDialog('ไม่สามารถเปิดเอกสารได้', context);
+                              }
+                            }
+                          }
+                        },
+                        child: Text('เปิด', style: TextStyle(fontSize: 12.sp)),
+                      ),
                     ],
                   ),
                 ],
@@ -120,28 +156,41 @@ class DocumentCardWidget extends ConsumerWidget {
     );
   }
 
-  String _formatDate(DateTime date) {
-    final now = DateTime.now();
-    final diff = now.difference(date).inDays;
-    if (diff == 0) return 'วันนี้';
-    if (diff == 1) return 'เมื่อวาน';
-    if (diff < 7) return '$diff วันที่แล้ว';
-    if (diff < 30) return '${(diff / 7).floor()} สัปดาห์ที่แล้ว';
-    return '${date.day}/${date.month}/${date.year}';
-  }
-
-  Widget _buildInfoChip(IconData icon, String text, Color color) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-      decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8.r)),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 12.w, color: color),
-          SizedBox(width: 4.w),
-          Text(text, style: TextStyle(fontSize: 10.sp, color: color, fontWeight: FontWeight.w600)),
-        ],
-      ),
+  void _showErrorDialog(String message, context) {
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+            title: Row(children: [Icon(Icons.error_outline, color: Colors.red, size: 24.w), SizedBox(width: 8.w), const Text('เกิดข้อผิดพลาด')]),
+            content: Text(message),
+            actions: [TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('ตกลง'))],
+          ),
     );
   }
+
+  // String _formatDate(DateTime date) {
+  //   final now = DateTime.now();
+  //   final diff = now.difference(date).inDays;
+  //   if (diff == 0) return 'วันนี้';
+  //   if (diff == 1) return 'เมื่อวาน';
+  //   if (diff < 7) return '$diff วันที่แล้ว';
+  //   if (diff < 30) return '${(diff / 7).floor()} สัปดาห์ที่แล้ว';
+  //   return '${date.day}/${date.month}/${date.year}';
+  // }
+
+  // Widget _buildInfoChip(IconData icon, String text, Color color) {
+  //   return Container(
+  //     padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+  //     decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8.r)),
+  //     child: Row(
+  //       mainAxisSize: MainAxisSize.min,
+  //       children: [
+  //         Icon(icon, size: 12.w, color: color),
+  //         SizedBox(width: 4.w),
+  //         Text(text, style: TextStyle(fontSize: 10.sp, color: color, fontWeight: FontWeight.w600)),
+  //       ],
+  //     ),
+  //   );
+  // }
 }

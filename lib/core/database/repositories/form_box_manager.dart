@@ -8,14 +8,23 @@ class FormBoxManager {
   Box<FormModel> get formBox => _formBox;
   List<FormModel> getAll() => _formBox.getAll();
   Stream<List<FormModel>> streamAll() => _formBox.query().watch(triggerImmediately: true).map((e) => e.find());
+  // Stream<List<FormModel>> streamBySelectCate(int categoryId, String searchText) {
+  //   if (categoryId == 1) {
+  //     return _formBox.query(FormModel_.formName.contains(searchText, caseSensitive: false) ).watch(triggerImmediately: true).map((e) => e.find());
+  //   } else {
+  //     return _formBox
+  //         .query(FormModel_.categoryId.equals(categoryId).and(FormModel_.formName.contains(searchText, caseSensitive: false)))
+  //         .watch(triggerImmediately: true)
+  //         .map((e) => e.find());
+  //   }
+  // }
   Stream<List<FormModel>> streamBySelectCate(int categoryId, String searchText) {
+    final condition = FormModel_.formName.contains(searchText, caseSensitive: false).or(FormModel_.categoryName.contains(searchText, caseSensitive: false));
+
     if (categoryId == 1) {
-      return _formBox.query(FormModel_.formName.contains(searchText, caseSensitive: false)).watch(triggerImmediately: true).map((e) => e.find());
+      return _formBox.query(condition).watch(triggerImmediately: true).map((query) => query.find());
     } else {
-      return _formBox
-          .query(FormModel_.categoryId.equals(categoryId).and(FormModel_.formName.contains(searchText, caseSensitive: false)))
-          .watch(triggerImmediately: true)
-          .map((e) => e.find());
+      return _formBox.query(FormModel_.categoryId.equals(categoryId).and(condition)).watch(triggerImmediately: true).map((query) => query.find());
     }
   }
 
@@ -26,6 +35,10 @@ class FormBoxManager {
     if (existingForm != null) {
       existingForm.favorite = !existingForm.favorite;
       database.formBoxManager.formBox.put(existingForm);
+    }
+    var categoryItem = database.categoryFormBoxManager.categoryFormBox.query(CategoryFormModel_.categoryId.equals(form.categoryId)).build().findFirst();
+    if (categoryItem != null) {
+      database.categoryFormBoxManager.categoryFormBox.put(categoryItem);
     }
   }
 

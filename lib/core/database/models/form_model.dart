@@ -9,6 +9,7 @@ class FormModel {
   int categoryId = 0; // Assuming this is needed for linking to a category
   String code = '';
   String formName;
+  String categoryName;
   String? formImage;
   @Property(type: PropertyType.date)
   DateTime? formUpdatedAt;
@@ -16,12 +17,14 @@ class FormModel {
   String pdfPath = '';
   bool favorite = false;
   final categoryForm = ToOne<CategoryFormModel>();
+  
   FormModel({
     this.id = 0,
     this.formId = 0,
     this.code = '',
     this.categoryId = 0, // Initialize with a default value
     this.formName = '',
+    this.categoryName = '',
     this.formImage,
     this.formUpdatedAt,
     this.formActive = true,

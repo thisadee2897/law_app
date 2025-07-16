@@ -82,7 +82,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(2, 840176663917475305),
     name: 'FormModel',
-    lastPropertyId: const obx_int.IdUid(11, 7630692736525170121),
+    lastPropertyId: const obx_int.IdUid(12, 500204112207383514),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -150,6 +150,12 @@ final _entities = <obx_int.ModelEntity>[
       obx_int.ModelProperty(
         id: const obx_int.IdUid(11, 7630692736525170121),
         name: 'code',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(12, 500204112207383514),
+        name: 'categoryName',
         type: 9,
         flags: 0,
       ),
@@ -379,7 +385,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
             : fbb.writeString(object.formImage!);
         final pdfPathOffset = fbb.writeString(object.pdfPath);
         final codeOffset = fbb.writeString(object.code);
-        fbb.startTable(12);
+        final categoryNameOffset = fbb.writeString(object.categoryName);
+        fbb.startTable(13);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, formNameOffset);
         fbb.addOffset(2, formImageOffset);
@@ -391,6 +398,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addInt64(8, object.formId);
         fbb.addInt64(9, object.categoryId);
         fbb.addOffset(10, codeOffset);
+        fbb.addOffset(11, categoryNameOffset);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -426,6 +434,9 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final formNameParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGet(buffer, rootOffset, 6, '');
+        final categoryNameParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 26, '');
         final formImageParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGetNullable(buffer, rootOffset, 8);
@@ -453,6 +464,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           code: codeParam,
           categoryId: categoryIdParam,
           formName: formNameParam,
+          categoryName: categoryNameParam,
           formImage: formImageParam,
           formUpdatedAt: formUpdatedAtParam,
           formActive: formActiveParam,
@@ -655,6 +667,11 @@ class FormModel_ {
   /// See [FormModel.code].
   static final code = obx.QueryStringProperty<FormModel>(
     _entities[1].properties[10],
+  );
+
+  /// See [FormModel.categoryName].
+  static final categoryName = obx.QueryStringProperty<FormModel>(
+    _entities[1].properties[11],
   );
 }
 

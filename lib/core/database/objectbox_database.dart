@@ -60,7 +60,7 @@ class ObjectBoxDatabase {
         form.id = 0;
         formBoxManager.formBox.put(form);
       } else {
-        form.id = existingForm.id;
+        form.formId = existingForm.formId;
         formBoxManager.formBox.put(form);
       }
     }
