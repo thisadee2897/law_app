@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:law_app/core/router/route_config.dart';
-import 'package:law_app/features/form/views/pdf_screen.dart';
 import 'package:law_app/features/home/views/home_screen.dart';
 // import 'package:law_app/features/reminder/views/create_and_update_reminder_screen.dart';
 import 'package:law_app/features/reminder/views/reminder_screen.dart';
@@ -23,13 +22,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         branches: [
           StatefulShellBranch(
             navigatorKey: _shellNavigatorHomeKey,
-            routes: [
-              GoRoute(
-                path: Routes.home,
-                pageBuilder: (context, state) => NoTransitionPage(child: HomeScreen()),
-                routes: [GoRoute(path: Routes.pdf, pageBuilder: (context, state) => NoTransitionPage(child: PDFScreen()))],
-              ),
-            ],
+            routes: [GoRoute(path: Routes.home, pageBuilder: (context, state) => NoTransitionPage(child: HomeScreen()))],
           ),
           StatefulShellBranch(
             navigatorKey: _shellNavigatorReminderKey,
