@@ -86,8 +86,8 @@ class AppBarDocument extends ConsumerWidget {
                         },
                         child: Container(
                           padding: EdgeInsets.all(12),
-                          decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(16)),
-                          child: Icon(Icons.folder_special, size: 32, color: Colors.yellow),
+                          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
+                          child: Icon(Icons.favorite, size: 32, color: const Color.fromARGB(255, 255, 0, 0)),
                         ),
                       ),
                     ],
