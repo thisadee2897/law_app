@@ -115,9 +115,22 @@ class ReminderNotifier {
       }
       _reminderBoxManager.update(updatedReminder);
 
-      await NotificationService.cancelNotification(updatedReminder.id);
+      // Cancel old notification first
+      try {
+        await NotificationService.cancelNotification(updatedReminder.id);
+        print('🗑️ Cancelled old notification for reminder ID: ${updatedReminder.id}');
+      } catch (e) {
+        print('⚠️ Warning: Could not cancel old notification: $e');
+      }
+
+      // Schedule new notification if active
       if (updatedReminder.isActive) {
-        await NotificationService.scheduleNotification(updatedReminder);
+        try {
+          await NotificationService.scheduleNotification(updatedReminder);
+          print('✅ Rescheduled notification for updated reminder: ${updatedReminder.title}');
+        } catch (e) {
+          print('❌ Error scheduling notification for updated reminder: $e');
+        }
       }
     }
   }
@@ -129,16 +142,33 @@ class ReminderNotifier {
       _reminderBoxManager.update(updatedReminder);
 
       if (updatedReminder.isActive) {
-        await NotificationService.scheduleNotification(updatedReminder);
+        try {
+          await NotificationService.scheduleNotification(updatedReminder);
+          print('✅ Enabled notification for reminder: ${updatedReminder.title}');
+        } catch (e) {
+          print('❌ Error enabling notification: $e');
+        }
       } else {
-        await NotificationService.cancelNotification(updatedReminder.id);
+        try {
+          await NotificationService.cancelNotification(updatedReminder.id);
+          print('🔕 Disabled notification for reminder: ${updatedReminder.title}');
+        } catch (e) {
+          print('⚠️ Warning: Could not disable notification: $e');
+        }
       }
     }
   }
 
   Future<void> deleteReminder(int id) async {
-    await NotificationService.cancelNotification(id);
+    try {
+      await NotificationService.cancelNotification(id);
+      print('🗑️ Cancelled notification for deleted reminder ID: $id');
+    } catch (e) {
+      print('⚠️ Warning: Could not cancel notification for deleted reminder: $e');
+    }
+    
     _reminderBoxManager.delete(id);
+    print('✅ Deleted reminder from database ID: $id');
   }
 
   testNotification() async {

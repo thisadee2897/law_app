@@ -12,6 +12,12 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.remove();
   
+  // Handle uncaught errors
+  FlutterError.onError = (FlutterErrorDetails details) {
+    print('❌ Flutter Error: ${details.exception}');
+    print('❌ Stack Trace: ${details.stack}');
+  };
+  
   try {
     // Initialize notification service
     await NotificationService.init();
@@ -33,24 +39,37 @@ void main() async {
     //   print('⚠️ Notifications not enabled - skipping test notification');
     // }
     
-    // Reschedule all active reminders
-    final allReminders = ObjectBoxDatabase.instance.reminderBox.getAll();
-    print('📋 Found ${allReminders.length} reminders in database');
-    
-    int rescheduledCount = 0;
-    for (var reminder in allReminders) {
-      if (reminder.isActive) {
-        try {
-          await NotificationService.scheduleNotification(reminder);
-          rescheduledCount++;
-          print('✅ Rescheduled reminder: ${reminder.title}');
-        } catch (e) {
-          print('❌ Failed to reschedule reminder ${reminder.title}: $e');
+    // Reschedule all active reminders with better error handling
+    try {
+      final allReminders = ObjectBoxDatabase.instance.reminderBox.getAll();
+      print('📋 Found ${allReminders.length} reminders in database');
+      
+      // First, cancel all existing notifications to avoid conflicts
+      try {
+        await NotificationService.cancelAllNotifications();
+        print('🧹 Cleared all existing notifications');
+      } catch (e) {
+        print('⚠️ Warning: Could not clear existing notifications: $e');
+      }
+      
+      int rescheduledCount = 0;
+      for (var reminder in allReminders) {
+        if (reminder.isActive) {
+          try {
+            await NotificationService.scheduleNotification(reminder);
+            rescheduledCount++;
+            print('✅ Rescheduled reminder: ${reminder.title}');
+          } catch (e) {
+            print('❌ Failed to reschedule reminder ${reminder.title}: $e');
+          }
         }
       }
+      
+      print('🎯 Successfully rescheduled $rescheduledCount active reminders');
+    } catch (e) {
+      print('❌ Critical error during notification rescheduling: $e');
+      // Continue anyway - app should still work without notifications
     }
-    
-    print('🎯 Successfully rescheduled $rescheduledCount active reminders');
     
   } catch (e) {
     print('❌ Error during app initialization: $e');

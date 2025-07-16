@@ -1,6 +1,4 @@
 // services/notification_service.dart
-import 'dart:typed_data';
-import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:injectable/injectable.dart';
 import 'package:law_app/core/database/models/reminder_model.dart';
@@ -83,35 +81,20 @@ class NotificationService {
       final int notificationId = reminder.id;
       final DateTime scheduledDateTime = reminder.getScheduledDateTime;
 
-      final NotificationDetails notificationDetails = NotificationDetails(
-        android: const AndroidNotificationDetails(
+      const NotificationDetails notificationDetails = NotificationDetails(
+        android: AndroidNotificationDetails(
           'reminder_channel_id', // ID ที่ไม่ซ้ำกันสำหรับ Channel
           'Reminder Channel', // ชื่อ Channel ที่ผู้ใช้จะเห็น
           channelDescription: 'Channel for reminder notifications',
-          importance: Importance.max, // เพิ่มเป็น max
-          priority: Priority.max, // เพิ่มเป็น max
-          ticker: 'Law Reminder',
-          enableVibration: true,
-          enableLights: true,
-          playSound: true,
-          showWhen: true,
-          colorized: true,
-          category: AndroidNotificationCategory.reminder,
-          visibility: NotificationVisibility.public,
-          // ใช้เสียงเริ่มต้นของระบบ
-          sound: null, // ให้ใช้เสียงเริ่มต้นจาก notification channel
-          fullScreenIntent: true, // เพิ่มเพื่อให้เด้งขึ้นมาเต็มจอ
-          autoCancel: true,
-          ongoing: false,
+          importance: Importance.high,
+          priority: Priority.high,
+          ticker: 'ticker',
         ),
-        iOS: const DarwinNotificationDetails(
+        iOS: DarwinNotificationDetails(
+          sound: 'default.wav', // ตรวจสอบว่ามีไฟล์เสียงนี้อยู่ใน Runner project ของ iOS (ถ้าใช้เสียง custom)
           presentAlert: true,
           presentBadge: true,
           presentSound: true,
-          sound: null, // ใช้เสียงเริ่มต้นของระบบ
-          badgeNumber: 1,
-          categoryIdentifier: 'reminder_category',
-          interruptionLevel: InterruptionLevel.timeSensitive, // เปลี่ยนเป็น timeSensitive
         ),
       );
 
@@ -296,26 +279,15 @@ class NotificationService {
     try {
       const NotificationDetails notificationDetails = NotificationDetails(
         android: AndroidNotificationDetails(
-          'reminder_channel_id', // ใช้ channel เดียวกัน
-          'Reminder Channel',
-          channelDescription: 'Channel for reminder notifications',
+          'test_channel_id', // ID ใหม่สำหรับ Channel ทดสอบ
+          'Test Channel',
+          channelDescription: 'Channel for testing notifications',
           importance: Importance.max, // ตั้งค่าสูงสุดเพื่อให้เด้งขึ้นมา
           priority: Priority.max,
           ticker: 'Test Ticker',
           fullScreenIntent: true, // ลองเปิด fullScreenIntent เพื่อให้เด้งขึ้นมาเต็มจอ
-          enableVibration: true,
-          playSound: true,
-          enableLights: true,
-          sound: null, // ใช้เสียงเริ่มต้นของระบบ
-          autoCancel: true,
         ),
-        iOS: DarwinNotificationDetails(
-          presentAlert: true, 
-          presentBadge: true, 
-          presentSound: true,
-          sound: null, // ใช้เสียงเริ่มต้นของระบบ
-          interruptionLevel: InterruptionLevel.timeSensitive,
-        ),
+        iOS: DarwinNotificationDetails(presentAlert: true, presentBadge: true, presentSound: true),
       );
 
       await _flutterLocalNotificationsPlugin.show(
@@ -373,18 +345,13 @@ class NotificationService {
   /// Create notification channel for Android
   static Future<void> _createNotificationChannel() async {
     try {
-      final AndroidNotificationChannel channel = AndroidNotificationChannel(
+      const AndroidNotificationChannel channel = AndroidNotificationChannel(
         'reminder_channel_id',
         'Reminder Channel',
         description: 'Channel for reminder notifications',
-        importance: Importance.max, // เพิ่มเป็น max
+        importance: Importance.high,
         enableVibration: true,
-        vibrationPattern: Int64List.fromList([0, 1000, 500, 1000]), // รูปแบบการสั่น
         playSound: true,
-        enableLights: true,
-        ledColor: const Color.fromARGB(255, 255, 0, 0), // ไฟ LED สีแดง
-        showBadge: true,
-        sound: null, // ใช้เสียงเริ่มต้นของระบบ
       );
 
       final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
