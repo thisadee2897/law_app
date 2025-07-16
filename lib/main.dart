@@ -11,66 +11,45 @@ import 'core/theme/app_theme.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.remove();
-  
-  // Handle uncaught errors
+
+  // จัดการ Error ที่เกิดจาก Flutter
   FlutterError.onError = (FlutterErrorDetails details) {
     print('❌ Flutter Error: ${details.exception}');
     print('❌ Stack Trace: ${details.stack}');
   };
-  
+
   try {
-    // Initialize notification service
-    await NotificationService.init();
-    print('✅ NotificationService initialized successfully');
-    
-    // Initialize ObjectBox database
+    // ✅ 1. Init ObjectBox
     await ObjectBoxDatabase.init();
     print('✅ ObjectBox database initialized successfully');
-    
-    // Check notification permissions
+
+    // ✅ 2. Init Notification
+    await NotificationService.init();
+    print('✅ NotificationService initialized successfully');
+
+    // ✅ 3. ตรวจสอบว่าเปิดสิทธิ์แจ้งเตือนหรือยัง
     final isEnabled = await NotificationService.areNotificationsEnabled();
     print('📱 Notifications enabled: $isEnabled');
-    
-    // Test notification to verify it's working (only if enabled)
-    // if (isEnabled) {
-    //   await NotificationService.showInstantNotification();
-    //   print('🔔 Test notification sent');
-    // } else {
-    //   print('⚠️ Notifications not enabled - skipping test notification');
-    // }
-    
-    // Reschedule all active reminders with better error handling
-    try {
-      final allReminders = ObjectBoxDatabase.instance.reminderBox.getAll();
-      print('📋 Found ${allReminders.length} reminders in database');
-      
-      // First, cancel all existing notifications to avoid conflicts
+
+    // ✅ 4. เรียก schedule เฉพาะ reminders ที่ active และ scheduledTime > now
+    final allReminders = ObjectBoxDatabase.instance.reminderBox.getAll();
+    final activeReminders = allReminders.where((r) =>
+      r.isActive && r.getScheduledDateTime.isAfter(DateTime.now())
+    );
+
+    print('📋 Found ${activeReminders.length} active future reminders');
+
+    int successCount = 0;
+    for (final reminder in activeReminders) {
       try {
-        await NotificationService.cancelAllNotifications();
-        print('🧹 Cleared all existing notifications');
+        await NotificationService.scheduleNotification(reminder);
+        print('✅ Scheduled reminder: ${reminder.title}');
+        successCount++;
       } catch (e) {
-        print('⚠️ Warning: Could not clear existing notifications: $e');
+        print('❌ Failed to schedule reminder: ${reminder.title} - $e');
       }
-      
-      int rescheduledCount = 0;
-      for (var reminder in allReminders) {
-        if (reminder.isActive) {
-          try {
-            await NotificationService.scheduleNotification(reminder);
-            rescheduledCount++;
-            print('✅ Rescheduled reminder: ${reminder.title}');
-          } catch (e) {
-            print('❌ Failed to reschedule reminder ${reminder.title}: $e');
-          }
-        }
-      }
-      
-      print('🎯 Successfully rescheduled $rescheduledCount active reminders');
-    } catch (e) {
-      print('❌ Critical error during notification rescheduling: $e');
-      // Continue anyway - app should still work without notifications
     }
-    
+    print('🎯 Rescheduled $successCount reminders successfully');
   } catch (e) {
     print('❌ Error during app initialization: $e');
   }
