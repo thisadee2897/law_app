@@ -103,7 +103,7 @@ class CurrentCategoryData {
         categoryFormFullName: 'กฎกระทรวงการขึ้นทะเบียนและการอนุญาตให้บริการเพื่อส่งเสริมความปลอดภัยอาชีวอนามัยและสภาพแวดล้อมในการทำงานพ.ศ.๒๕๖๔',
         categoryFormImage: 'assets/images/fervour-lighting-sound-2559.png',
         categoryFormUpdatedAt: DateTime.parse('2023-10-01T12:00:00Z'),
-        categoryFormActive: false,
+        categoryFormActive: true,
       ),
       CategoryFormModel(
         categoryId: 13,
@@ -127,7 +127,7 @@ class CurrentCategoryData {
         categoryFormFullName: 'กฎกระทรวงกำหนดมาตรฐานเกี่ยวกับระบบการจัดการด้านความปลอดภัยพ.ศ.๒๕๖๕',
         categoryFormImage: 'assets/images/fervour-lighting-sound-2559.png',
         categoryFormUpdatedAt: DateTime.parse('2023-10-01T12:00:00Z'),
-        categoryFormActive: false,
+        categoryFormActive: true,
       ),
       CategoryFormModel(
         categoryId: 16,
@@ -143,7 +143,7 @@ class CurrentCategoryData {
         categoryFormFullName: 'การอนุญาตเป็นผู้ชำนาญการด้านความปลอดภัยอาชีวอนามัยและสภาพแวดล้อมในการทำงานพ.ศ.๒๕๖๗',
         categoryFormImage: 'assets/images/fervour-lighting-sound-2559.png',
         categoryFormUpdatedAt: DateTime.parse('2023-10-01T12:00:00Z'),
-        categoryFormActive: false,
+        categoryFormActive: true,
       ),
       CategoryFormModel(
         categoryId: 18,
@@ -152,6 +152,14 @@ class CurrentCategoryData {
         categoryFormImage: 'assets/images/fervour-lighting-sound-2559.png',
         categoryFormUpdatedAt: DateTime.parse('2023-10-01T12:00:00Z'),
         categoryFormActive: false,
+      ),
+      CategoryFormModel(
+        categoryId: 19,
+        categoryFormName: 'อื่นๆ',
+        categoryFormFullName: 'อื่นๆ',
+        categoryFormImage: 'assets/images/fervour-lighting-sound-2559.png',
+        categoryFormUpdatedAt: DateTime.parse('2023-10-01T12:00:00Z'),
+        categoryFormActive: true,
       ),
     ];
   }
@@ -668,6 +676,90 @@ class CurrentFormPDFData {
         formUpdatedAt: DateTime.now(),
         formActive: true,
         pdfPath: 'assets/pdfs/1622.pdf',
+      ),
+      FormModel(
+        formId: 46,
+        categoryId: 12, // 12_การขึ้นทะเบียนและการอนุญาตให้บริการ
+        categoryName: 'การขึ้นทะเบียนและการอนุญาตให้บริการ',
+        code: '1201',
+        formName:
+            'ประกาศกรมสวัสดิการและคุ้มครองแรงงานเรื่องแบบคำขอและ รับคำขอใบสำคัญหรือใบแทนใบสำคัญการขึ้นทะเบียนบุคคลแบบคำขอและรับคำขอใบอนุญาตใบแทนใบอนุญาตหรือการต่ออายุใบอนุญาตของนิติบุคคลใบสำคัญแทนใบสำคัญใบอนุญาตและใบแทนใบอนุญาต',
+        formImage: null,
+        formUpdatedAt: DateTime.now(),
+        formActive: true,
+        pdfPath: 'assets/pdfs/1201.pdf',
+      ),
+      FormModel(
+        formId: 47,
+        categoryId: 12, // 12_การขึ้นทะเบียนและการอนุญาตให้บริการ
+        categoryName: 'การขึ้นทะเบียนและการอนุญาตให้บริการ',
+        code: '1202',
+        formName:
+            'ประกาศกรมสวัสดิการและคุ้มครองแรงงานเรื่องการกำหนดการให้บริการและการรายงานสรุปผลการให้บริการด้านความปลอดภัยอาชีวะอนามัยและสภาพแวดล้อมในการทำงานของผู้รับใบสำคัญและผู้รับใบอนุญาต',
+        formImage: null,
+        formUpdatedAt: DateTime.now(),
+        formActive: true,
+        pdfPath: 'assets/pdfs/1202.pdf',
+      ),
+      FormModel(
+        formId: 48,
+        categoryId: 12, // 12_การขึ้นทะเบียนและการอนุญาตให้บริการ
+        categoryName: 'การขึ้นทะเบียนและการอนุญาตให้บริการ',
+        code: '1203',
+        formName:
+            'อัตราค่าธรรมเนียมการอนุญาตเพื่อเป็นผู้ให้บริการเพื่อส่งเสริมความปลอดภัย อาชีวอนามัย และสภาพแวดล้อมในการทำงาน (ของนิติบุคคล)',
+        formImage: null,
+        formUpdatedAt: DateTime.now(),
+        formActive: true,
+        pdfPath: 'assets/pdfs/1203.pdf',
+      ),
+      FormModel(
+        formId: 49,
+        categoryId: 12, // 12_การขึ้นทะเบียนและการอนุญาตให้บริการ
+        categoryName: 'การขึ้นทะเบียนและการอนุญาตให้บริการ',
+        code: '1204',
+        formName:
+            'อัตราค่าธรรมเนียมการขึ้นทะเบียน เพื่อเป็นผู้ให้บริการเพื่อส่งเสริมความปลอดภัย อาชีวอนามัย และสภาพแวดล้อมในการทำงาน (ของบุคคลธรรมดา)',
+        formImage: null,
+        formUpdatedAt: DateTime.now(),
+        formActive: true,
+        pdfPath: 'assets/pdfs/1204.pdf',
+      ),
+      FormModel(
+        formId: 50,
+        categoryId: 15, // 15_ระบบการจัดการด้านความปลอดภัย
+        categoryName: 'ระบบการจัดการด้านความปลอดภัย',
+        code: '1501',
+        formName:
+            'กฎกระทรวง กำหนดมาตรฐานเกี่ยวกับระบบ จัดการด้านความปลอดภัยพ.ศ. 2565',
+        formImage: null,
+        formUpdatedAt: DateTime.now(),
+        formActive: true,
+        pdfPath: 'assets/pdfs/1501.pdf',
+      ),
+      FormModel(
+        formId: 51,
+        categoryId: 17, // 17_การอนุญาตเป็นผู้ชำนาญการด้านความปลอดภัยฯ
+        categoryName: 'การอนุญาตเป็นผู้ชำนาญการด้านความปลอดภัยฯ',
+        code: '1701',
+        formName:
+            'กฎกระทรวงการอนุญาตเป็นผู้ชำนาญการด้านความปลอดภัยอาชีวะอนามัยและสภาพแวดล้อมในการทำงานพ.ศ. 2567',
+        formImage: null,
+        formUpdatedAt: DateTime.now(),
+        formActive: true,
+        pdfPath: 'assets/pdfs/1701.pdf',
+      ),
+      FormModel(
+        formId: 52,
+        categoryId: 19, // 19_อื่นๆ
+        categoryName: 'อื่นๆ',
+        code: '1901',
+        formName:
+            'กำหนดกิจการอื่นที่ไม่อยู่ภายใต้บังคับ กฏหมายว่าด้วยความปลอดภัยอาชีวอนามัย และสภาพแวดล้อมในการทำงาน',
+        formImage: null,
+        formUpdatedAt: DateTime.now(),
+        formActive: true,
+        pdfPath: 'assets/pdfs/1901.pdf',
       ),
     ];
   }

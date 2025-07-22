@@ -138,7 +138,7 @@ class ReminderNotifier {
   Future<void> toggleReminderActiveStatus(int id) async {
     final existingReminder = _reminderBoxManager.get(id);
     if (existingReminder != null) {
-      final updatedReminder = existingReminder.copyWith(isActive: !existingReminder.isActive);
+      final updatedReminder = existingReminder.copyWith(isActive: false);
       _reminderBoxManager.update(updatedReminder);
 
       if (updatedReminder.isActive) {
@@ -158,6 +158,8 @@ class ReminderNotifier {
       }
     }
   }
+  
+
 
   Future<void> deleteReminder(int id) async {
     try {

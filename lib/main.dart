@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:law_app/core/database/objectbox_database.dart';
 import 'package:law_app/core/utils/services/notification_service.dart';
+import 'package:upgrader/upgrader.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 
@@ -13,10 +14,10 @@ void main() async {
   FlutterNativeSplash.remove();
 
   // จัดการ Error ที่เกิดจาก Flutter
-  FlutterError.onError = (FlutterErrorDetails details) {
-    print('❌ Flutter Error: ${details.exception}');
-    print('❌ Stack Trace: ${details.stack}');
-  };
+  // FlutterError.onError = (FlutterErrorDetails details) {
+  //   print('❌ Flutter Error: ${details.exception}');
+  //   print('❌ Stack Trace: ${details.stack}');
+  // };
 
   try {
     // ✅ 1. Init ObjectBox
@@ -33,9 +34,7 @@ void main() async {
 
     // ✅ 4. เรียก schedule เฉพาะ reminders ที่ active และ scheduledTime > now
     final allReminders = ObjectBoxDatabase.instance.reminderBox.getAll();
-    final activeReminders = allReminders.where((r) =>
-      r.isActive && r.getScheduledDateTime.isAfter(DateTime.now())
-    );
+    final activeReminders = allReminders.where((r) => r.isActive && r.getScheduledDateTime.isAfter(DateTime.now()));
 
     print('📋 Found ${activeReminders.length} active future reminders');
 
@@ -53,7 +52,8 @@ void main() async {
   } catch (e) {
     print('❌ Error during app initialization: $e');
   }
-
+  await Upgrader.clearSavedSettings();
+  await Upgrader().initialize();
   runApp(const ProviderScope(child: MyApp()));
 }
 

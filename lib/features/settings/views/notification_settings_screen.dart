@@ -147,46 +147,46 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
     }
   }
 
-  Future<void> _showPendingNotifications() async {
-    try {
-      final pending = await NotificationService.getPendingNotifications();
-      if (mounted) {
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('การแจ้งเตือนที่รอดำเนินการ'),
-            content: SizedBox(
-              width: double.maxFinite,
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: pending.length,
-                itemBuilder: (context, index) {
-                  final notification = pending[index];
-                  return ListTile(
-                    title: Text(notification.title ?? 'ไม่มีชื่อ'),
-                    subtitle: Text(notification.body ?? 'ไม่มีรายละเอียด'),
-                    trailing: Text('ID: ${notification.id}'),
-                  );
-                },
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('ปิด'),
-              ),
-            ],
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('เกิดข้อผิดพลาดในการดูการแจ้งเตือนที่รอดำเนินการ: $e')),
-        );
-      }
-    }
-  }
+  // Future<void> _showPendingNotifications() async {
+  //   try {
+  //     final pending = await NotificationService.getPendingNotifications();
+  //     if (mounted) {
+  //       showDialog(
+  //         context: context,
+  //         builder: (context) => AlertDialog(
+  //           title: const Text('การแจ้งเตือนที่รอดำเนินการ'),
+  //           content: SizedBox(
+  //             width: double.maxFinite,
+  //             child: ListView.builder(
+  //               shrinkWrap: true,
+  //               itemCount: pending.length,
+  //               itemBuilder: (context, index) {
+  //                 final notification = pending[index];
+  //                 return ListTile(
+  //                   title: Text(notification.title ?? 'ไม่มีชื่อ'),
+  //                   subtitle: Text(notification.body ?? 'ไม่มีรายละเอียด'),
+  //                   trailing: Text('ID: ${notification.id}'),
+  //                 );
+  //               },
+  //             ),
+  //           ),
+  //           actions: [
+  //             TextButton(
+  //               onPressed: () => Navigator.of(context).pop(),
+  //               child: const Text('ปิด'),
+  //             ),
+  //           ],
+  //         ),
+  //       );
+  //     }
+  //   } catch (e) {
+  //     if (mounted) {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text('เกิดข้อผิดพลาดในการดูการแจ้งเตือนที่รอดำเนินการ: $e')),
+  //       );
+  //     }
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -339,16 +339,16 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                       label: const Text('ทดสอบการแจ้งเตือน'),
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  // const SizedBox(height: 8),
                   
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: _showPendingNotifications,
-                      icon: const Icon(Icons.list),
-                      label: const Text('ดูการแจ้งเตือนที่รอดำเนินการ'),
-                    ),
-                  ),
+                  // SizedBox(
+                  //   width: double.infinity,
+                  //   child: ElevatedButton.icon(
+                  //     onPressed: _showPendingNotifications,
+                  //     icon: const Icon(Icons.list),
+                  //     label: const Text('ดูการแจ้งเตือนที่รอดำเนินการ'),
+                  //   ),
+                  // ),
                   const SizedBox(height: 8),
                   
                   SizedBox(

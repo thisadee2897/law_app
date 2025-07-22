@@ -217,75 +217,77 @@ class SelectedPdfChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Container(
-      margin: const EdgeInsets.only(right: 8, bottom: 8),
-      decoration: BoxDecoration(
-        color: !downloadable ? theme.primaryColor.withOpacity(0.1) : Colors.transparent,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: !downloadable ? theme.primaryColor.withOpacity(0.3) : Colors.green),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.picture_as_pdf, size: 16, color: theme.primaryColor),
-            const SizedBox(width: 8),
-            Flexible(
-              child: Text(
-                fileName,
-                style: theme.textTheme.bodySmall?.copyWith(color: 
-                
-                downloadable ? Colors.green:
-                theme.primaryColor, fontWeight: FontWeight.w500),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            const SizedBox(width: 8),
-            if (!downloadable)
-              GestureDetector(
-                onTap: onRemove,
-                child: Container(
-                  width: 18,
-                  height: 18,
-                  decoration: BoxDecoration(color: theme.primaryColor, shape: BoxShape.circle),
-                  child: Icon(Icons.close, size: 12, color: theme.colorScheme.onPrimary),
+    return GestureDetector(
+      onTap: downloadable ?() => download(context) : null,
+      child: Container(
+        margin: const EdgeInsets.only(right: 8, bottom: 8),
+        decoration: BoxDecoration(
+          color: !downloadable ? theme.primaryColor.withOpacity(0.1) : Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: !downloadable ? theme.primaryColor.withOpacity(0.3) : Colors.green),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.picture_as_pdf, size: 16, color: theme.primaryColor),
+              const SizedBox(width: 8),
+              Flexible(
+                child: Text(
+                  fileName,
+                  style: theme.textTheme.bodySmall?.copyWith(color: downloadable ? Colors.green : theme.primaryColor, fontWeight: FontWeight.w500),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
-            if (downloadable)
-              // downloadable
-              GestureDetector(
-                onTap: () async {
-                  try {
-                    final byteData = await rootBundle.load(form.pdfPath);
-                    final bytes = byteData.buffer.asUint8List();
-                    final dir = await getTemporaryDirectory();
-                    final fileName = "SafeDoc_app_file_${form.code}_${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}";
-                    print('File name: $fileName');
-                    final file = File('${dir.path}/$fileName.pdf');
-                    if (await file.exists()) {
-                      await file.delete();
-                    }
-                    await file.writeAsBytes(bytes);
-                    await OpenFile.open(file.path);
-                  } catch (e) {
-                    // Show error dialog
-                    if (context.mounted) {
-                      _showErrorDialog('ไม่สามารถเปิดเอกสารได้', context);
-                    }
-                  }
-                },
-                child: Container(
-                  width: 18,
-                  height: 18,
-                  decoration: BoxDecoration(color: Colors.green, shape: BoxShape.circle),
-                  child: Icon(Icons.download, size: 12, color: Colors.white),
+              const SizedBox(width: 8),
+              if (!downloadable)
+                GestureDetector(
+                  onTap: onRemove,
+                  child: Container(
+                    width: 18,
+                    height: 18,
+                    decoration: BoxDecoration(color: theme.primaryColor, shape: BoxShape.circle),
+                    child: Icon(Icons.close, size: 12, color: theme.colorScheme.onPrimary),
+                  ),
                 ),
-              ),
-          ],
+              if (downloadable)
+                // downloadable
+                GestureDetector(
+                  onTap: () => download(context),
+                  child: Container(
+                    width: 18,
+                    height: 18,
+                    decoration: BoxDecoration(color: Colors.green, shape: BoxShape.circle),
+                    child: Icon(Icons.download, size: 12, color: Colors.white),
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  Future<void> download(BuildContext context) async {
+    try {
+      final byteData = await rootBundle.load(form.pdfPath);
+      final bytes = byteData.buffer.asUint8List();
+      final dir = await getTemporaryDirectory();
+      final fileName = "SafeDoc_app_file_${form.code}_${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}";
+      print('File name: $fileName');
+      final file = File('${dir.path}/$fileName.pdf');
+      if (await file.exists()) {
+        await file.delete();
+      }
+      await file.writeAsBytes(bytes);
+      await OpenFile.open(file.path);
+    } catch (e) {
+      // Show error dialog
+      if (context.mounted) {
+        _showErrorDialog('ไม่สามารถเปิดเอกสารได้', context);
+      }
+    }
   }
 
   void _showErrorDialog(String message, BuildContext context) {

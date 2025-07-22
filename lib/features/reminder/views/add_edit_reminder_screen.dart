@@ -6,7 +6,7 @@ import 'package:law_app/features/reminder/providers/add_edit_reminder_provider_n
 import 'package:law_app/features/reminder/providers/reminder_provider.dart';
 import 'package:law_app/features/reminder/widgets/custom_widgets.dart';
 import 'package:law_app/features/reminder/widgets/multi_select_pdf_bottom_sheet.dart';
-import 'package:law_app/features/reminder/widgets/recurrence_bottom_sheet.dart';
+// import 'package:law_app/features/reminder/widgets/recurrence_bottom_sheet.dart';
 
 class AddEditReminderScreen extends ConsumerStatefulWidget {
   final ReminderModel? reminder;
@@ -38,9 +38,9 @@ class _AddEditReminderScreenState extends ConsumerState<AddEditReminderScreen> {
     final theme = Theme.of(context);
     final state = ref.watch(addEditReminderProvider);
     final notifier = ref.read(addEditReminderProvider.notifier);
-    final recurrenceNames = ref.watch(recurrenceNamesProvider);
-    final weekdayNames = ref.watch(weekdayNamesProvider);
-    final monthNames = ref.watch(monthNamesProvider);
+    // final recurrenceNames = ref.watch(recurrenceNamesProvider);
+    // final weekdayNames = ref.watch(weekdayNamesProvider);
+    // final monthNames = ref.watch(monthNamesProvider);
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -141,24 +141,24 @@ class _AddEditReminderScreenState extends ConsumerState<AddEditReminderScreen> {
                       ),
                     ),
 
-                    // Recurrence Section
-                    CustomCard(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('การทำซ้ำ', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
-                          const SizedBox(height: 12),
-                          SelectionCard(
-                            enabled: !state.isOverdue,
-                            title: recurrenceNames[state.recurrenceType] ?? 'ไม่ทำซ้ำ',
-                            subtitle: _getRecurrenceSubtitle(state, weekdayNames, monthNames),
-                            icon: Icons.repeat,
-                            hasValue: state.recurrenceType != 'none',
-                            onTap: () => _showRecurrenceSelection(context, ref, notifier),
-                          ),
-                        ],
-                      ),
-                    ),
+                    // // Recurrence Section
+                    // CustomCard(
+                    //   child: Column(
+                    //     crossAxisAlignment: CrossAxisAlignment.start,
+                    //     children: [
+                    //       Text('การทำซ้ำ', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
+                    //       const SizedBox(height: 12),
+                    //       SelectionCard(
+                    //         enabled: !state.isOverdue,
+                    //         title: recurrenceNames[state.recurrenceType] ?? 'ไม่ทำซ้ำ',
+                    //         subtitle: _getRecurrenceSubtitle(state, weekdayNames, monthNames),
+                    //         icon: Icons.repeat,
+                    //         hasValue: state.recurrenceType != 'none',
+                    //         onTap: () => _showRecurrenceSelection(context, ref, notifier),
+                    //       ),
+                    //     ],
+                    //   ),
+                    // ),
 
                     // Active Status (for editing only)
                     if (widget.reminder != null)
@@ -222,31 +222,31 @@ class _AddEditReminderScreenState extends ConsumerState<AddEditReminderScreen> {
     }
   }
 
-  String? _getRecurrenceSubtitle(AddEditReminderState state, Map<int, String> weekdayNames, Map<int, String> monthNames) {
-    switch (state.recurrenceType) {
-      case 'weekly':
-        if (state.selectedDayOfWeek != null) {
-          return 'ทุกวัน${weekdayNames[state.selectedDayOfWeek!]}';
-        }
-        break;
-      case 'monthly':
-        if (state.selectedDayOfMonth != null) {
-          return 'ทุกวันที่ ${state.selectedDayOfMonth!} ของเดือน';
-        }
-        break;
-      case 'yearly':
-        if (state.selectedDayOfMonth != null && state.selectedMonthOfYear != null) {
-          return 'ทุกวันที่ ${state.selectedDayOfMonth!} ${monthNames[state.selectedMonthOfYear!]}';
-        }
-        break;
-      case 'daily':
-        return 'ทุกวันในเวลาเดียวกัน';
-      case 'none':
-      default:
-        return 'แจ้งเตือนเพียงครั้งเดียว';
-    }
-    return null;
-  }
+  // String? _getRecurrenceSubtitle(AddEditReminderState state, Map<int, String> weekdayNames, Map<int, String> monthNames) {
+  //   switch (state.recurrenceType) {
+  //     case 'weekly':
+  //       if (state.selectedDayOfWeek != null) {
+  //         return 'ทุกวัน${weekdayNames[state.selectedDayOfWeek!]}';
+  //       }
+  //       break;
+  //     case 'monthly':
+  //       if (state.selectedDayOfMonth != null) {
+  //         return 'ทุกวันที่ ${state.selectedDayOfMonth!} ของเดือน';
+  //       }
+  //       break;
+  //     case 'yearly':
+  //       if (state.selectedDayOfMonth != null && state.selectedMonthOfYear != null) {
+  //         return 'ทุกวันที่ ${state.selectedDayOfMonth!} ${monthNames[state.selectedMonthOfYear!]}';
+  //       }
+  //       break;
+  //     case 'daily':
+  //       return 'ทุกวันในเวลาเดียวกัน';
+  //     case 'none':
+  //     default:
+  //       return 'แจ้งเตือนเพียงครั้งเดียว';
+  //   }
+  //   return null;
+  // }
 
   Future<void> _pickDateTime(BuildContext context, WidgetRef ref, AddEditReminderNotifier notifier) async {
     final state = ref.read(addEditReminderProvider);
@@ -292,16 +292,16 @@ class _AddEditReminderScreenState extends ConsumerState<AddEditReminderScreen> {
     );
   }
 
-  void _showRecurrenceSelection(BuildContext context, WidgetRef ref, AddEditReminderNotifier notifier) {
-    final state = ref.read(addEditReminderProvider);
+  // void _showRecurrenceSelection(BuildContext context, WidgetRef ref, AddEditReminderNotifier notifier) {
+  //   final state = ref.read(addEditReminderProvider);
 
-    showModalBottomSheet(
-      isScrollControlled: true,
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => RecurrenceBottomSheet(currentRecurrence: state.recurrenceType, onRecurrenceChanged: notifier.setRecurrenceType),
-    );
-  }
+  //   showModalBottomSheet(
+  //     isScrollControlled: true,
+  //     context: context,
+  //     backgroundColor: Colors.transparent,
+  //     builder: (context) => RecurrenceBottomSheet(currentRecurrence: state.recurrenceType, onRecurrenceChanged: notifier.setRecurrenceType),
+  //   );
+  // }
 
   Future<void> _saveReminder(BuildContext context, WidgetRef ref, AddEditReminderNotifier notifier) async {
     if (!notifier.validateForm()) {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:law_app/core/database/models/reminder_model.dart';
+import 'package:law_app/core/database/objectbox_database.dart';
 import 'package:law_app/features/reminder/providers/add_edit_reminder_provider_new.dart';
 import 'package:law_app/features/reminder/providers/reminder_provider.dart';
 import 'package:law_app/features/reminder/views/add_edit_reminder_screen.dart';
@@ -222,19 +223,17 @@ class _ReminderScreenState extends ConsumerState<ReminderScreen> {
                         ],
                       ),
                     ),
-
-                  const Spacer(),
-
                   // Action buttons
+                  const Spacer(),
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      IconButton(
-                        onPressed: () => notifier.toggleReminderActiveStatus(reminder.id),
-                        icon: Icon(reminder.isActive ? Icons.pause : Icons.play_arrow, color: reminder.isActive ? Colors.orange : Colors.green),
-                        tooltip: reminder.isActive ? 'ปิดการแจ้งเตือน' : 'เปิดการแจ้งเตือน',
-                        style: IconButton.styleFrom(backgroundColor: (reminder.isActive ? Colors.orange : Colors.green).withOpacity(0.1)),
-                      ),
+                      // IconButton(
+                      //   onPressed: () => notifier.toggleReminderActiveStatus(reminder.id),
+                      //   icon: Icon(reminder.isActive ? Icons.pause : Icons.play_arrow, color: reminder.isActive ? Colors.orange : Colors.green),
+                      //   tooltip: reminder.isActive ? 'ปิดการแจ้งเตือน' : 'เปิดการแจ้งเตือน',
+                      //   style: IconButton.styleFrom(backgroundColor: (reminder.isActive ? Colors.orange : Colors.green).withOpacity(0.1)),
+                      // ),
                       IconButton(
                         onPressed: () => _navigateToEdit(context, reminder),
                         icon: const Icon(Icons.edit),
@@ -331,7 +330,7 @@ class _ReminderScreenState extends ConsumerState<ReminderScreen> {
     final theme = Theme.of(context);
     final reminderListAsync = ref.watch(reminderListProvider);
     final reminderNotifier = ref.watch(reminderNotifierProvider);
-
+    final database = ObjectBoxDatabase.instance;
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
@@ -349,32 +348,11 @@ class _ReminderScreenState extends ConsumerState<ReminderScreen> {
           ),
         ],
       ),
-      body: reminderListAsync.when(
-        data: (reminders) {
-          if (reminders.isEmpty) {
-            return _buildEmptyState(context);
-          }
-          // Sort reminders by scheduled time
-          final sortedReminders = List<ReminderModel>.from(reminders)..sort((a, b) => a.getScheduledDateTime.compareTo(b.getScheduledDateTime));
-
-          return RefreshIndicator(
-            onRefresh: () async {
-              await Future.delayed(const Duration(seconds: 1));
-              await ref.read(reminderListProvider.future);
-            },
-            child: ListView.builder(
-              padding: const EdgeInsets.only(top: 8, bottom: 100),
-              itemCount: sortedReminders.length,
-              itemBuilder: (context, index) {
-                final reminder = sortedReminders[index];
-                return _buildReminderCard(context, reminder, reminderNotifier);
-              },
-            ),
-          );
-        },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error:
-            (err, stack) => Center(
+      body: StreamBuilder(
+        stream: database.reminderBox.streamAll(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Center(
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -385,7 +363,7 @@ class _ReminderScreenState extends ConsumerState<ReminderScreen> {
                     Text('เกิดข้อผิดพลาด', style: theme.textTheme.headlineSmall?.copyWith(color: Colors.red, fontWeight: FontWeight.w600)),
                     const SizedBox(height: 8),
                     Text(
-                      '$err',
+                      '${snapshot.error}',
                       style: theme.textTheme.bodyMedium?.copyWith(color: theme.textTheme.bodyMedium?.color?.withOpacity(0.7)),
                       textAlign: TextAlign.center,
                     ),
@@ -394,8 +372,92 @@ class _ReminderScreenState extends ConsumerState<ReminderScreen> {
                   ],
                 ),
               ),
+            );
+          }
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return _buildEmptyState(context);
+          }
+          final reminders = snapshot.data!;
+          // Sort reminders by scheduled time
+          final sortedReminders = List<ReminderModel>.from(reminders)..sort((a, b) => a.getScheduledDateTime.compareTo(b.getScheduledDateTime));
+          return RefreshIndicator(
+            onRefresh: () async {
+              await Future.delayed(const Duration(seconds: 1));
+              await ref.read(reminderListProvider.future);
+              // ปิดการใช้งาน อันที่เลยเวลาแล้ว
+              for (final reminder in sortedReminders) {
+                if (!reminder.isActive && reminder.getScheduledDateTime.isBefore(DateTime.now())) {
+                  await reminderNotifier.toggleReminderActiveStatus(reminder.id);
+                }
+              }
+            },
+            child: ListView.builder(
+              padding: const EdgeInsets.only(top: 8, bottom: 100),
+              itemCount: sortedReminders.length,
+              itemBuilder: (context, index) {
+                final reminder = sortedReminders[index];
+                if (reminder.isActive && reminder.getScheduledDateTime.isBefore(DateTime.now())) {
+                  // ปิดการใช้งานอันที่เลยเวลาแล้ว
+                  reminderNotifier.toggleReminderActiveStatus(reminder.id);
+                }
+                return _buildReminderCard(context, reminder, reminderNotifier);
+              },
             ),
+          );
+        },
       ),
+      // body: reminderListAsync.when(
+      //   data: (reminders) {
+      //     if (reminders.isEmpty) {
+      //       return _buildEmptyState(context);
+      //     }
+      //     // Sort reminders by scheduled time
+      //     final sortedReminders = List<ReminderModel>.from(reminders)..sort((a, b) => a.getScheduledDateTime.compareTo(b.getScheduledDateTime));
+      //     return RefreshIndicator(
+      //       onRefresh: () async {
+      //         await Future.delayed(const Duration(seconds: 1));
+      //         await ref.read(reminderListProvider.future);
+      //         // ปิดการใช้งาน อันที่เลยเวลาแล้ว
+      //         for (final reminder in sortedReminders) {
+      //           if (!reminder.isActive && reminder.getScheduledDateTime.isBefore(DateTime.now())) {
+      //             await reminderNotifier.toggleReminderActiveStatus(reminder.id);
+      //           }
+      //         }
+      //       },
+      //       child: ListView.builder(
+      //         padding: const EdgeInsets.only(top: 8, bottom: 100),
+      //         itemCount: sortedReminders.length,
+      //         itemBuilder: (context, index) {
+      //           final reminder = sortedReminders[index];
+      //           return _buildReminderCard(context, reminder, reminderNotifier);
+      //         },
+      //       ),
+      //     );
+      //   },
+      //   loading: () => const Center(child: CircularProgressIndicator()),
+      //   error:
+      //       (err, stack) => Center(
+      //         child: Padding(
+      //           padding: const EdgeInsets.all(16),
+      //           child: Column(
+      //             mainAxisAlignment: MainAxisAlignment.center,
+      //             children: [
+      //               Icon(Icons.error_outline, size: 64, color: Colors.red.withOpacity(0.6)),
+      //               const SizedBox(height: 16),
+      //               Text('เกิดข้อผิดพลาด', style: theme.textTheme.headlineSmall?.copyWith(color: Colors.red, fontWeight: FontWeight.w600)),
+      //               const SizedBox(height: 8),
+      //               Text(
+      //                 '$err',
+      //                 style: theme.textTheme.bodyMedium?.copyWith(color: theme.textTheme.bodyMedium?.color?.withOpacity(0.7)),
+      //                 textAlign: TextAlign.center,
+      //               ),
+      //               const SizedBox(height: 16),
+      //               ElevatedButton(onPressed: () => ref.refresh(reminderListProvider), child: const Text('ลองใหม่')),
+      //             ],
+      //           ),
+      //         ),
+      //       ),
+      // ),
       floatingActionButton:
           reminderListAsync.value?.isEmpty == true
               ? null
