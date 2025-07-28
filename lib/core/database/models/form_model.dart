@@ -5,6 +5,7 @@ import 'package:objectbox/objectbox.dart';
 class FormModel {
   @Id()
   int id = 0;
+  @Unique()
   int formId = 0; // Assuming this is needed for linking to a category
   int categoryId = 0; // Assuming this is needed for linking to a category
   String code = '';
@@ -17,7 +18,7 @@ class FormModel {
   String pdfPath = '';
   bool favorite = false;
   final categoryForm = ToOne<CategoryFormModel>();
-  
+
   FormModel({
     this.id = 0,
     this.formId = 0,

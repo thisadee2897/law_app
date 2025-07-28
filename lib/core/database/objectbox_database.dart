@@ -4,7 +4,6 @@ import 'package:law_app/objectbox.g.dart';
 import 'package:path_provider/path_provider.dart';
 import 'repositories/form_box_manager.dart';
 import 'package:path/path.dart' show join;
-
 import 'repositories/remider_box_manager.dart';
 
 class ObjectBoxDatabase {
@@ -16,12 +15,6 @@ class ObjectBoxDatabase {
   late final CategoryFormBoxManager categoryFormBoxManager;
   late final FormBoxManager formBoxManager;
   late final ReminderBoxManager reminderBox;
-  // late final UnitBoxManager units;
-  // late final PropertyBoxManager properties;
-  // late final PropertyValueBoxManager propertyValues;
-  // late final PropertyForProductBoxManager propertyForProducts;
-  // late final JobHDBoxManager jobHDBoxManager;
-  // late final JobItemBoxManager jobItemBoxManager;
 
   ObjectBoxDatabase._(this._store) {
     categoryFormBoxManager = CategoryFormBoxManager(_store);
@@ -37,36 +30,65 @@ class ObjectBoxDatabase {
     return _instance;
   }
 
-
   _updateData() {
     final currentCategoryData = CurrentCategoryData.getData().where((e) => e.categoryFormActive).toList();
     final formData = CurrentFormPDFData.getData();
-    // Update only if there are existing records
+
+    // ✅ อัปเดต Category
     for (var category in currentCategoryData) {
-      final existingCategory = categoryFormBoxManager.categoryFormBox.query(CategoryFormModel_.categoryId.equals(category.categoryId)).build().findFirst();
-      if (existingCategory == null) {
+      final duplicates = categoryFormBoxManager.categoryFormBox
+          .query(CategoryFormModel_.categoryId.equals(category.categoryId))
+          .build()
+          .find();
+
+      if (duplicates.isEmpty) {
         category.id = 0;
         categoryFormBoxManager.add(category);
       } else {
-        category.id = existingCategory.id;
+        // ลบตัวที่ซ้ำ เก็บตัวแรกไว้
+        for (var i = 1; i < duplicates.length; i++) {
+          categoryFormBoxManager.categoryFormBox.remove(duplicates[i].id);
+        }
+
+        category.id = duplicates[0].id;
         categoryFormBoxManager.update(category);
       }
+
       var forms = formData.where((form) => form.categoryId == category.categoryId).toList();
       print("forms for category ${category.categoryFormName}: ${forms.length}");
     }
+
+    // ✅ อัปเดต Form
     for (var form in formData) {
-      final existingForm = formBoxManager.formBox.query(FormModel_.formId.equals(form.formId)).build().findFirst();
-      if (existingForm == null) {
+      final duplicates = formBoxManager.formBox
+          .query(FormModel_.formId.equals(form.formId))
+          .build()
+          .find();
+
+      if (duplicates.isEmpty) {
         form.id = 0;
         formBoxManager.formBox.put(form);
       } else {
-        form.formId = existingForm.formId;
+        final existing = duplicates.first;
+
+        // ❗️เก็บค่าสถานะที่ผู้ใช้เปลี่ยนไว้
+        form.id = existing.id;
+        form.favorite = existing.favorite;
+        // ลบตัวอื่นที่ซ้ำ (ยกเว้นตัวแรก)
+        for (var i = 1; i < duplicates.length; i++) {
+          formBoxManager.formBox.remove(duplicates[i].id);
+        }
         formBoxManager.formBox.put(form);
       }
     }
-    // update forms for each category
+
+    // ✅ ผูก Form กับ Category
     for (var category in currentCategoryData) {
-      final forms = formData.where((form) => form.categoryId == category.categoryId).toList();
+      final forms = formBoxManager.formBox
+          .query(FormModel_.categoryId.equals(category.categoryId))
+          .build()
+          .find();
+
       if (forms.isNotEmpty) {
         final categoryModel = categoryFormBoxManager.categoryFormBox.get(category.id);
         if (categoryModel != null) {

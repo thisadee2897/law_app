@@ -6,6 +6,7 @@ import 'package:objectbox/objectbox.dart';
 class CategoryFormModel {
   @Id()
   int id = 0;
+  @Unique()
   int  categoryId = 0; // Assuming this is needed for linking to a category
   String categoryFormName;
   String categoryFormFullName;
