@@ -113,7 +113,7 @@ class _ReminderScreenState extends ConsumerState<ReminderScreen> {
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
-        onTap: () => _navigateToEdit(context, reminder),
+        onTap: () => _navigateToShow(context, reminder),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -228,18 +228,13 @@ class _ReminderScreenState extends ConsumerState<ReminderScreen> {
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // IconButton(
-                      //   onPressed: () => notifier.toggleReminderActiveStatus(reminder.id),
-                      //   icon: Icon(reminder.isActive ? Icons.pause : Icons.play_arrow, color: reminder.isActive ? Colors.orange : Colors.green),
-                      //   tooltip: reminder.isActive ? 'ปิดการแจ้งเตือน' : 'เปิดการแจ้งเตือน',
-                      //   style: IconButton.styleFrom(backgroundColor: (reminder.isActive ? Colors.orange : Colors.green).withOpacity(0.1)),
-                      // ),
-                      IconButton(
-                        onPressed: () => _navigateToEdit(context, reminder),
-                        icon: const Icon(Icons.edit),
-                        tooltip: 'แก้ไข',
-                        style: IconButton.styleFrom(backgroundColor: theme.primaryColor.withOpacity(0.1), foregroundColor: theme.primaryColor),
-                      ),
+                      if (reminder.isActive)
+                        IconButton(
+                          onPressed: () => _navigateToEdit(context, reminder),
+                          icon: const Icon(Icons.edit),
+                          tooltip: 'แก้ไข',
+                          style: IconButton.styleFrom(backgroundColor: theme.primaryColor.withOpacity(0.1), foregroundColor: theme.primaryColor),
+                        ),
                       IconButton(
                         onPressed: () => _showDeleteDialog(context, reminder, notifier),
                         icon: const Icon(Icons.delete),
@@ -299,7 +294,12 @@ class _ReminderScreenState extends ConsumerState<ReminderScreen> {
 
   void _navigateToEdit(BuildContext context, ReminderModel reminder) {
     ref.read(addEditReminderProvider.notifier).isInitialized = false;
-    Navigator.of(context).push(MaterialPageRoute(builder: (context) => AddEditReminderScreen(reminder: reminder)));
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) => AddEditReminderScreen(reminder: reminder, isReadOnly: false)));
+  }
+
+  void _navigateToShow(BuildContext context, ReminderModel reminder) {
+    ref.read(addEditReminderProvider.notifier).isInitialized = false;
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) => AddEditReminderScreen(reminder: reminder, isReadOnly: true)));
   }
 
   void _showDeleteDialog(BuildContext context, ReminderModel reminder, ReminderNotifier notifier) {
@@ -406,58 +406,6 @@ class _ReminderScreenState extends ConsumerState<ReminderScreen> {
           );
         },
       ),
-      // body: reminderListAsync.when(
-      //   data: (reminders) {
-      //     if (reminders.isEmpty) {
-      //       return _buildEmptyState(context);
-      //     }
-      //     // Sort reminders by scheduled time
-      //     final sortedReminders = List<ReminderModel>.from(reminders)..sort((a, b) => a.getScheduledDateTime.compareTo(b.getScheduledDateTime));
-      //     return RefreshIndicator(
-      //       onRefresh: () async {
-      //         await Future.delayed(const Duration(seconds: 1));
-      //         await ref.read(reminderListProvider.future);
-      //         // ปิดการใช้งาน อันที่เลยเวลาแล้ว
-      //         for (final reminder in sortedReminders) {
-      //           if (!reminder.isActive && reminder.getScheduledDateTime.isBefore(DateTime.now())) {
-      //             await reminderNotifier.toggleReminderActiveStatus(reminder.id);
-      //           }
-      //         }
-      //       },
-      //       child: ListView.builder(
-      //         padding: const EdgeInsets.only(top: 8, bottom: 100),
-      //         itemCount: sortedReminders.length,
-      //         itemBuilder: (context, index) {
-      //           final reminder = sortedReminders[index];
-      //           return _buildReminderCard(context, reminder, reminderNotifier);
-      //         },
-      //       ),
-      //     );
-      //   },
-      //   loading: () => const Center(child: CircularProgressIndicator()),
-      //   error:
-      //       (err, stack) => Center(
-      //         child: Padding(
-      //           padding: const EdgeInsets.all(16),
-      //           child: Column(
-      //             mainAxisAlignment: MainAxisAlignment.center,
-      //             children: [
-      //               Icon(Icons.error_outline, size: 64, color: Colors.red.withOpacity(0.6)),
-      //               const SizedBox(height: 16),
-      //               Text('เกิดข้อผิดพลาด', style: theme.textTheme.headlineSmall?.copyWith(color: Colors.red, fontWeight: FontWeight.w600)),
-      //               const SizedBox(height: 8),
-      //               Text(
-      //                 '$err',
-      //                 style: theme.textTheme.bodyMedium?.copyWith(color: theme.textTheme.bodyMedium?.color?.withOpacity(0.7)),
-      //                 textAlign: TextAlign.center,
-      //               ),
-      //               const SizedBox(height: 16),
-      //               ElevatedButton(onPressed: () => ref.refresh(reminderListProvider), child: const Text('ลองใหม่')),
-      //             ],
-      //           ),
-      //         ),
-      //       ),
-      // ),
       floatingActionButton:
           reminderListAsync.value?.isEmpty == true
               ? null

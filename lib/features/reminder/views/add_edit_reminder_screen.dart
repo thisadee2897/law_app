@@ -10,8 +10,9 @@ import 'package:law_app/features/reminder/widgets/multi_select_pdf_bottom_sheet.
 
 class AddEditReminderScreen extends ConsumerStatefulWidget {
   final ReminderModel? reminder;
+  final bool isReadOnly;
 
-  const AddEditReminderScreen({super.key, this.reminder});
+  const AddEditReminderScreen({super.key, this.reminder, this.isReadOnly = false});
 
   @override
   ConsumerState<AddEditReminderScreen> createState() => _AddEditReminderScreenState();
@@ -48,10 +49,13 @@ class _AddEditReminderScreenState extends ConsumerState<AddEditReminderScreen> {
         elevation: 0,
         backgroundColor: theme.scaffoldBackgroundColor,
         foregroundColor: theme.textTheme.titleLarge?.color,
-        title: Text(
-          widget.reminder == null ? 'เพิ่มเตือนความจำ' : 'แก้ไขเตือนความจำ',
-          style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-        ),
+        title:
+            widget.isReadOnly
+                ? Text(widget.reminder?.title ?? 'ดูเตือนความจำ', style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold))
+                : Text(
+                  widget.reminder == null ? 'เพิ่มเตือนความจำ' : 'แก้ไขเตือนความจำ',
+                  style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                ),
       ),
       body:
           state.isLoading
@@ -64,7 +68,7 @@ class _AddEditReminderScreenState extends ConsumerState<AddEditReminderScreen> {
                     // Title Section
                     CustomCard(
                       child: CustomTextField(
-                        enabled: !state.isOverdue,
+                        enabled: !widget.isReadOnly,
                         label: 'ชื่อเตือนความจำ',
                         hintText: 'ใส่ชื่อเตือนความจำ...',
                         controller: state.titleController,
@@ -76,7 +80,7 @@ class _AddEditReminderScreenState extends ConsumerState<AddEditReminderScreen> {
                     // Description Section
                     CustomCard(
                       child: CustomTextField(
-                        enabled: !state.isOverdue,
+                        enabled: !widget.isReadOnly,
                         label: 'รายละเอียด (ไม่บังคับ)',
                         hintText: 'เพิ่มรายละเอียดเตือนความจำ...',
                         controller: state.descriptionController,
@@ -94,7 +98,7 @@ class _AddEditReminderScreenState extends ConsumerState<AddEditReminderScreen> {
                           Text('ไฟล์ PDF ที่เกี่ยวข้อง', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
                           const SizedBox(height: 12),
                           SelectionCard(
-                            enabled: !state.isOverdue,
+                            enabled: !widget.isReadOnly,
                             title: state.selectedPdfs.isEmpty ? 'เลือกไฟล์ PDF' : '${state.selectedPdfs.length} ไฟล์ที่เลือก',
                             icon: Icons.picture_as_pdf,
                             hasValue: state.selectedPdfs.isNotEmpty,
@@ -107,7 +111,7 @@ class _AddEditReminderScreenState extends ConsumerState<AddEditReminderScreen> {
                                   state.selectedPdfs
                                       .map(
                                         (pdf) => SelectedPdfChip(
-                                          downloadable: state.isOverdue,
+                                          downloadable: widget.isReadOnly,
                                           form: pdf,
                                           fileName: pdf.formName,
                                           onRemove: () => notifier.removePdf(pdf),
@@ -128,7 +132,7 @@ class _AddEditReminderScreenState extends ConsumerState<AddEditReminderScreen> {
                           Text('วันที่และเวลา', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
                           const SizedBox(height: 12),
                           SelectionCard(
-                            enabled: !state.isOverdue,
+                            enabled: !widget.isReadOnly,
                             title:
                                 state.selectedDateTime == null ? 'เลือกวันและเวลา' : DateFormat('dd MMMM yyyy, HH:mm น.', 'th').format(state.selectedDateTime!),
                             subtitle: state.selectedDateTime == null ? 'แตะเพื่อเลือกวันที่และเวลาแจ้งเตือน' : _getRelativeTimeText(state.selectedDateTime!),
@@ -140,26 +144,6 @@ class _AddEditReminderScreenState extends ConsumerState<AddEditReminderScreen> {
                         ],
                       ),
                     ),
-
-                    // // Recurrence Section
-                    // CustomCard(
-                    //   child: Column(
-                    //     crossAxisAlignment: CrossAxisAlignment.start,
-                    //     children: [
-                    //       Text('การทำซ้ำ', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
-                    //       const SizedBox(height: 12),
-                    //       SelectionCard(
-                    //         enabled: !state.isOverdue,
-                    //         title: recurrenceNames[state.recurrenceType] ?? 'ไม่ทำซ้ำ',
-                    //         subtitle: _getRecurrenceSubtitle(state, weekdayNames, monthNames),
-                    //         icon: Icons.repeat,
-                    //         hasValue: state.recurrenceType != 'none',
-                    //         onTap: () => _showRecurrenceSelection(context, ref, notifier),
-                    //       ),
-                    //     ],
-                    //   ),
-                    // ),
-
                     // Active Status (for editing only)
                     if (widget.reminder != null)
                       CustomCard(
@@ -171,13 +155,13 @@ class _AddEditReminderScreenState extends ConsumerState<AddEditReminderScreen> {
                             style: theme.textTheme.bodyMedium?.copyWith(color: theme.textTheme.bodyMedium?.color?.withOpacity(0.7)),
                           ),
                           value: state.isActive,
-                          onChanged: state.isOverdue ? null : notifier.setIsActive,
+                          onChanged: widget.isReadOnly ? null : notifier.setIsActive,
                         ),
                       ),
 
                     const SizedBox(height: 32),
                     // Save Button
-                    if (!state.isOverdue)
+                    if (!widget.isReadOnly)
                       SizedBox(
                         width: double.infinity,
                         height: 56,
